@@ -23,7 +23,7 @@
             class="ipt">
         </div>
         <div class="mid-for"
-          @click="handleFor">忘记密码?</div>
+          @click="handleFor">找回密码</div>
         <div class="mid-btn">
           <div plain round @click="loginBtn"> 登录</div>
           <div plain round @click="handleReg">注册</div>
@@ -58,28 +58,18 @@ export default {
         this.$toast('请输入密码')
         return
       }
-      this.$http
-        .post('/api/Login/Authenticate', {
-          mobile: this.mobile,
-          pwd: this.pwd,
-          UserType: 9
+      this.$http.post('/member/pub/login', {
+          account: this.mobile,
+          password: this.pwd,
         })
         .then(res => {
-          if (res.success) {
+          if (res.code == 1) {
             this.LOG_IN({
-              token: res.token,
-              userId: res.user.id
+              token: res.data.mytoken.token
             })
             this.$router.push({ name: 'index' })
-            if (res.message.errCode != 0) {
-              this.$dialog
-                .alert({
-                  message: res.message.message
-                })
-                .then(() => {
-                  // on close
-                })
-            }
+          } else {
+            this.$toast(res.msg)
           }
         })
         .catch(() => {})
@@ -95,8 +85,9 @@ export default {
 </script>
 <style lang="scss" scoped>
 .all {
-  padding: 3rem 6rem;
-  min-height: 580px;
+  padding: .666667rem 1.573333rem;
+  min-height: 7.733333rem;
+  text-align: center;
   .bgimg {
     position: absolute;
     top: 0;
@@ -109,33 +100,36 @@ export default {
 }
  
 .top {
+  border-radius: .266667rem;
   img {
-    width: 10px;
-    height: 9.5rem;
+    width: 2.43rem;
+    height:  2.43rem;
+    border-radius: .2rem;
+    box-shadow: 0 0 6px rgb(2, 5, 27);
   }
 }
 .mid {
-  padding-top: 4rem;
+  padding-top: 1.333333rem;
   .mid-account {
     width: 100%;
-    margin-top: 2rem;
-    height: 3rem;
+    margin-top: .333333rem;
+    height: .9rem;
     text-align: left;
-    border-bottom: 1px solid #fff;
+    border-bottom: .013333rem solid #fff;
     display: flex;
     box-sizing: border-box;
     
     i {
       color: #fff;
-      font-size: 2.2rem;
-      width: 3rem;
+      font-size: .6rem;
+      width: 1rem;
     }
     .ipt {
       flex: 1;
       border: none;
-      height: 2.8rem;
-      font-size: 1.6rem;
-      width: 13rem;
+      height: .666667rem;
+      font-size: .4rem;
+      width: 6rem;
       background: transparent;
       color: #fff;
     }
@@ -143,27 +137,28 @@ export default {
   .mid-for {
     color: #fff;
     text-align: right;
-    margin: 1rem 0;
-    font-size: 1.2rem;
+    margin: .213333rem 0;
+    font-size: .32rem;
   }
   .mid-btn {
     display: flex;
     flex-direction: column;
     color: #fff;
     width: 100%;
-    margin-top: 2rem;
+    margin-top: .666667rem;
     > div {
       width: 100%;
-      height: 4rem;
+      height: 1.066667rem;
       border: 1px solid #fff;
       border-radius: 2rem;
-      margin: 1rem 0;
+      margin: .2rem 0;
      
-      font-size: 1.4rem;
-      line-height: calc(4rem + 2px);
+      font-size: .4rem;
+      line-height: 1.093333rem;
     }
     > div:active {
-      background: #ccc;
+      background: #fff;
+      color: #40a3ff;
     }
   }
   input::-webkit-input-placeholder {

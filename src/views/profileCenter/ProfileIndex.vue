@@ -4,7 +4,7 @@
       <div class="top-bar">
         <van-row>
           <van-col span="8" offset="8"><span>个人中心</span></van-col>
-          <van-col span="3" offset="4"><span class="check-in">签到</span></van-col>
+          <van-col span="3" offset="4" @click="checkIn"><span class="check-in">签到</span></van-col>
         </van-row>
       </div>
       <!-- 个人信息 -->
@@ -12,27 +12,27 @@
         <van-row>
           <van-col span="22" offset="1">
             <div class="personal-info-wrapper">
-              <div class="left-avatar">
-
-                <img src="https://img.yzcdn.cn/vant/cat.jpeg" alt="">
+              <div class="left-avatar" @click="toNextPage('ProfileInfo')">
+                <img v-if="info.thumb" :src="info.thumb" alt="avatar">
+                <img v-else src="@/assets/index/logo.png" alt="avatar">
               </div>
               <div class="right-info">
                 <div class="right-info-top">
-                  <div class="rignt-info-wrapper">
-                    <span class="user-name">你你你你你豆子</span>
+                  <div class="rignt-info-wrapper" @click="toNextPage('ProfileInfo')">
+                    <span class="user-name">{{info.nickname}}</span>
                     <span class="user-level">
                       <img src="@/assets/personal/v.png" alt="" srcset="">
-                      <span class="v-number">0</span>
-                      <span class="v-text">普通会员</span>
+                      <span class="v-number">{{info.level}}</span>
+                      <span class="v-text">{{info.level_str}}</span>
                     </span>
                   </div>
-                  <div class="charge">
+                  <div class="charge" @click="toNextPage('Charge')">
                     <span>充值</span>
                     <img src="@/assets/personal/in.png" alt="" srcset="">
                   </div>
                 </div>
-                <div class="right-info-bottom">
-                  <span>邀请码：VFRG45243</span>
+                <div class="right-info-bottom" @click="toNextPage('ProfileInfo')">
+                  <span>邀请码：{{info.spread_code}}</span>
                 </div>
               </div>
             </div>
@@ -42,30 +42,30 @@
       <!-- 余额列表 -->
       <div class="balance-list">
         <van-row>
-          <van-col span="6">
-            <div class="balance-item">
-              <div class="balance-value">1200.00</div>
+          <van-col span="7">
+            <div class="balance-item" @click="toNextPage('Bill','point')">
+              <div class="balance-value">{{info.point}}</div>
+              <div class="balance-unit">积分</div>
+            </div>
+          </van-col>
+          <van-col span="10">
+            <div class="balance-item" @click="toNextPage('Bill','reward')">
+              <div class="balance-value">{{info.reward}}</div>
+              <div class="balance-unit">推广总收益（积分）</div>
+            </div>
+          </van-col>
+          <van-col span="7">
+            <div class="balance-item last-item" @click="toNextPage('Bill','amount')">
+              <div class="balance-value">{{info.amount}}</div>
               <div class="balance-unit">余额（元）</div>
             </div>
           </van-col>
-          <van-col span="6">
-            <div class="balance-item">
-              <div class="balance-value">0.00</div>
-              <div class="balance-unit">分润（元）</div>
-            </div>
-          </van-col>
-          <van-col span="6">
-            <div class="balance-item">
-              <div class="balance-value">0</div>
-              <div class="balance-unit">兑换券（张）</div>
-            </div>
-          </van-col>
-          <van-col span="6">
+          <!-- <van-col span="6">
             <div class="balance-item last-item">
               <div class="balance-value">30</div>
               <div class="balance-unit">积分（元）</div>
             </div>
-          </van-col>
+          </van-col> -->
         </van-row>
       </div>
 
@@ -75,8 +75,8 @@
       <van-row>
         <van-col span="22" offset="1">
           <div class="lost-wrapper">
-            <div class="lost-amount"><span>漏单</span><span class="lost-warn">100</span></div>
-            <div class="lost-money"><span>漏单金额：</span><span class="lost-all-money">&yen;1587.00</span></div>
+            <div class="lost-amount"><span>漏单</span><span class="lost-warn">{{info.slip_num}}</span></div>
+            <div class="lost-money"><span>漏单金额：</span><span class="lost-all-money">&yen; {{info.slip_money}}</span></div>
           </div>
         </van-col>
       </van-row>
@@ -84,7 +84,7 @@
     <!-- 推广广告 -->
     <div class="jump-banner">
       <van-row>
-        <van-col span="22" offset="1">
+        <van-col span="22" offset="1" @click="toNextPage('Upgrade')">
           <img src="@/assets/personal/banner01.png" alt="">
         </van-col>
       </van-row>
@@ -94,26 +94,26 @@
       <van-row>
         <van-col span="24">
           <div class="order-wrapper">
-            <van-cell title="我的订单" is-link value="查看全部订单">
+            <van-cell title="我的订单" is-link value="查看全部订单" @click="toNextPage('Order')">
               <img slot="icon" class="order-img" src="@/assets/personal/my-order.png" />
             </van-cell>
           </div>
         </van-col>
         <van-col span="22" offset="1">
           <div class="order-img-list">
-            <div class="img-item">
+            <div class="img-item" @click="toNextPage('Order')">
               <img src="@/assets/personal/deliver.png" alt="">
               <span>待发货</span>
             </div>
-            <div class="img-item">
+            <div class="img-item" @click="toNextPage('Order')">
               <img src="@/assets/personal/receive.png" alt="">
               <span>待收货</span>
             </div>
-            <div class="img-item">
+            <div class="img-item" @click="toNextPage('Order')">
               <img src="@/assets/personal/complete.png" alt="">
               <span>已完成</span>
             </div>
-            <div class="img-item">
+            <div class="img-item" @click="toNextPage('Order')">
               <img src="@/assets/personal/failed.png" alt="">
               <span>交易终止</span>
             </div>
@@ -125,23 +125,37 @@
     <div class="other-list">
       <!-- 01 我要推广 -->
       <div class="list-format">
-        <van-cell title="我要推广" is-link>
-
+        <van-cell title="我要推广" is-link @click="toNextPage('Promote')">
           <img slot="icon" class="other-list-img" src="@/assets/personal/my-promote.png" />
         </van-cell>
       </div>
 
+      <!-- 04 我的团队-->
+      <div class="list-format my-team">
+        <van-cell title="我的团队" is-link @click="toNextPage('Team')">
+          <img slot="icon" class="other-list-img" src="@/assets/personal/my-team.png" />
+          <template slot="title">
+            <div>
+              <span>我的团队</span>
+              <span class="my-team-num">{{info.team_num}} 人</span>
+            </div>
+          </template>
+        </van-cell>
+      </div>
       <!-- 02 我要提现 -->
       <!-- 02 我的账单 -->
       <!-- 02 收款账户设置 -->
       <div class="list-format">
-        <van-cell title="我要提现" is-link>
+        <van-cell title="我的分润" is-link @click="toNextPage('SliceMoney')">
+          <img slot="icon" class="other-list-img" src="@/assets/personal/my-splice.png" />
+        </van-cell>
+        <van-cell title="我要提现" is-link @click="toNextPage('Withdraw')">
           <img slot="icon" class="other-list-img" src="@/assets/personal/my-withdraw.png" />
         </van-cell>
-        <van-cell title="我的账单" is-link>
+        <van-cell title="我的账单" is-link @click="toNextPage('Bill')">
           <img slot="icon" class="other-list-img" src="@/assets/personal/my-bill.png" />
         </van-cell>
-        <van-cell title="收款账户设置" is-link>
+        <van-cell title="收款账户设置" is-link @click="toNextPage('Settings')">
           <img slot="icon" class="other-list-img" src="@/assets/personal/my-collect.png" />
         </van-cell>
       </div>
@@ -149,30 +163,21 @@
       <!-- 03 我要升级 -->
       <!-- 03 升级记录 -->
       <div class="list-format">
-        <van-cell title="我要升级" is-link>
+        <van-cell title="我的兑换券">
+          <span class="exchange-num" slot="default">{{info.exchange_num}} 张</span>
+          <img slot="icon" class="other-list-img" src="@/assets/personal/my-exchange.png" />
+        </van-cell>
+        <van-cell title="我要升级" is-link @click="toNextPage('Upgrade')">
           <img slot="icon" class="other-list-img" src="@/assets/personal/my-update.png" />
         </van-cell>
-        <van-cell title="升级记录" is-link>
+        <van-cell title="升级记录" is-link @click="toNextPage('UpgradeOrderRecord')">
           <img slot="icon" class="other-list-img" src="@/assets/personal/my-up-record.png" />
-        </van-cell>
-      </div>
-
-      <!-- 04 我的团队-->
-      <div class="list-format my-team">
-        <van-cell title="我的团队" is-link>
-          <img slot="icon" class="other-list-img" src="@/assets/personal/my-team.png" />
-          <template slot="title">
-            <div>
-              <span>我的团队</span>
-              <span class="my-team-num">123人</span>
-            </div>
-          </template>
         </van-cell>
       </div>
 
       <!-- 05 收货地址-->
       <div class="list-format">
-        <van-cell title="收货地址" is-link>
+        <van-cell title="收货地址" is-link @click="toNextPage('Address')">
           <img slot="icon" class="other-list-img" src="@/assets/personal/my-address.png" />
         </van-cell>
       </div>
@@ -180,22 +185,53 @@
       <!-- 06 联系客服-->
       <!-- 06 平台公告-->
       <div class="list-format">
-        <van-cell title="联系客服" is-link>
+        <van-cell title="联系客服" is-link @click="toNextPage('Service')">
           <img slot="icon" class="other-list-img" src="@/assets/personal/my-serve.png" />
         </van-cell>
-        <van-cell title="平台公告" is-link>
+        <van-cell title="平台公告" is-link @click="toNextPage('notice')">
           <img slot="icon" class="other-list-img" src="@/assets/personal/my-announce.png" />
         </van-cell>
       </div>
     </div>
-
+    <tabbar></tabbar>
   </div>
 </template>
 
 <script>
+import tabbar from '@/components/tabbar'
 export default {
+  components: {
+    tabbar
+  },
   data() {
-    return {}
+    return {
+      info: {}
+    }
+  },
+  created() {
+    this.getProfile()
+  },
+  methods: {
+    // 获取个人信息
+    getProfile() {
+      this.$http.get('/member/member/info').then(res => {
+        this.info = res.data.info
+      })
+    },
+    checkIn() {
+      this.$http
+        .post('/member/sign/record')
+        .then(res => {})
+        .catch(err => {
+          console.log(err)
+        })
+    },
+    toNextPage(routerName, accountClass) {
+      this.$router.push({
+        name: routerName,
+        query: { accountClass: accountClass }
+      })
+    }
   }
 }
 </script>
@@ -204,6 +240,8 @@ export default {
 .profile-body {
   // background-color: #f5f5f5;
   background-color: #fff;
+  margin-top: -50px;
+  margin-bottom: 2rem;
 }
 .profile-info {
   // border: 1px solid red;
@@ -268,8 +306,8 @@ export default {
             align-items: center;
             .user-name {
               display: inline-block;
-              margin-right: 0.266667rem;
-              width: 2.4rem;
+              margin-right: 0.166667rem;
+              max-width: 2.4rem;
               white-space: nowrap;
               text-overflow: ellipsis;
               -o-text-overflow: ellipsis;
@@ -424,6 +462,9 @@ export default {
       margin: auto 0;
       margin-right: 0.133333rem;
     }
+    .exchange-num {
+      color: #ff5f5f;
+    }
   }
   .my-team {
     .my-team-num {
@@ -431,6 +472,7 @@ export default {
       padding: 0.05rem 0.12rem;
       background-color: #40a3ff;
       border-radius: 20px;
+      color: #fff;
     }
   }
 }

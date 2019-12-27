@@ -2,7 +2,7 @@ import Vue from 'vue'
 import store from '@/store'
 import axios from 'axios'
 import Qs from 'qs'
-import router from '@/router'
+import router from '@/router/router'
 import {
   Toast
 } from "vant"
@@ -34,16 +34,16 @@ request.interceptors.request.use(
       }
     }
     config.headers = {
-        Authorization: 'Bearer ' +getCookie('token'),
-        ...config.headers
+      Authorization: 'Bearer ' + getCookie('token'),
+      ...config.headers
     }
     // 登录后所有请求附带token
-    // if (store.state.isLogin && store.state.token) {
-    //   config.headers = {
-    //     Authorization: 'Bearer ' + getCookie('token'),
-    //     ...config.headers
-    //   }
-    // }
+    if (store.state.isLogin && store.state.token) {
+      config.headers = {
+        Authorization: 'Bearer ' + getCookie('token'),
+        ...config.headers
+      }
+    }
 
     return config
   },
@@ -55,12 +55,12 @@ request.interceptors.request.use(
 request.interceptors.response.use(
   res => {
     Toast.clear();
-    if (res.data.success || res.data.errCode === 0) {
+    if (res.data.success || res.data.code === 0) {
       // successcess
-      if (res.data.message && res.data.message != "ok" &&res.data.message != "操作成功" && res.config.url!='/api/MemberAddress/ExpressSearch'  ) Toast.success(res.data.message)
+      if (res.data.msg && res.data.msg != "ok" && res.data.msg != "操作成功") Toast.success(res.data.msg)
     }
-    if (res.errCode === -1) {
-      Toast.fail(res.message)
+    if (res.data.code === 0) {
+      Toast.fail(res.data.msg)
     }
     if (res.data.success || res.data.code === 1) return res.data
     return Promise.reject(res.data)
@@ -69,17 +69,17 @@ request.interceptors.response.use(
     Toast.clear();
     // token 失效
     if (err.response) {
-      if (err.response.status === 401) {
+      if (err.response.status === 900) {
         Toast.fail('请重新登陆')
         store.commit('LOG_OUT')
         router.replace('/login')
       }
-      if (err.response.status === 403) {
-        Toast.fail('没有操作权限')
-      }
+      // if (err.response.status === 403) {
+      //   Toast.fail('没有操作权限')
+      // }
       if (err.response.status === 400) {
-        if (err.response.data && err.response.data.message)
-          Toast.fail(err.response.data.message)
+        if (err.response.data && err.response.data.msg)
+          Toast.fail(err.response.data.msg)
         else {
           Toast.fail(JSON.stringify(err.response.data))
         }

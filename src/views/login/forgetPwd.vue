@@ -1,58 +1,70 @@
 <template>
   <div class="warner">
-    <nav-bar :name="'忘记密码'"
+    <publicHeader :name="'忘记密码'"
       :icon="true" />
     <!-- <div class="top">已向您135****7890的手机号发送了1条验证码</div> -->
-    <van-field v-model="mobile"
-      label="手机号码"
-      input-align="right"
-      placeholder="请输入手机号码" />
-
-    <van-field v-model="smsCode"
-      input-align="right"
-      label="短信验证码"
-      placeholder="请输入短信验证码">
-      <van-button slot="button"
-        size="small"
-        @click.prevent="handleSms"
-        v-if="isShow"
-        color="#83ced9"
-        type="primary">发送验证码</van-button>
-      <van-button slot="button"
-        v-else
-        size="small"
-        color="#83ced9"
-        disabled
-        type="info">{{time}}S</van-button>
-    </van-field>
-
-    <van-field v-model="pwd"
-      label="新的密码"
-      input-align="right"
-       type="password"
-      placeholder="请输入新的密码" />
-    <van-field v-model="surePwd"
-      label="重复新的密码"
-      input-align="right"
-      type="password"
-      placeholder="请确认新的密码" />
-
-    <van-button @click="sure"
-      color="#83ced9"
-      :loading="false"
-      type="info"
-      class="btnBot"
-      loading-text="">确认更改</van-button>
+    <div class="forgetBody">
+      <div class="mid">
+        <div class="mid-account">
+          <span><span class="red">* </span>手机号</span>
+          <input type="text"
+            placeholder="请输入手机号"
+            v-model="mobile"
+            class="ipt">
+        </div>
+        <div class="mid-account">
+          <span><span class="red">* </span>验证码</span>
+          <div style="display: flex;flex: 1;">
+            <input type="text"
+              placeholder="请输入验证码"
+              v-model="smsCode"
+              class="ipt short">
+            <van-button @click.prevent="handleSms"
+              size="small"
+              plain
+              color="#40a3ff"
+              v-if="isShow">获取验证码</van-button>
+            <van-button size="small"
+              color="#40a3ff"
+              v-else
+              disabled
+              type="info">{{time}}S</van-button>
+          </div>
+        </div>
+        <div class="mid-account">
+          <span><span class="red">* </span>密码</span>
+          <input type="text"
+            placeholder="请输入密码"
+            v-model="pwd"
+            class="ipt">
+        </div>
+        <div class="mid-account">
+          <span><span class="red">* </span>确认密码</span>
+          <input type="text"
+            placeholder="请再次输入密码"
+            v-model="surePwd"
+            class="ipt">
+        </div>
+      </div>
+      <div></div>
+      <div class="mid-btn">
+        <van-button @click="submit"
+          color="#03d13e"
+          :loading="false"
+          type="info"
+          loading-text="">确认更改</van-button>
+      </div>
+    </div>
+    
   </div>
 </template>
 
 <script>
-import navBar from '@/components/navBar.vue'
-import { clearInterval } from 'timers';
+import publicHeader from '@/components/publicHeader.vue'
 import { mapState, mapMutations } from 'vuex'
 export default {
   components: {
-    navBar
+    publicHeader
   },
   props: {},
   data() {
@@ -75,12 +87,12 @@ export default {
         return
       }
       this.$http
-        .post('/api/SMS/FindPwdSMSCode', {
-          mobile: this.mobile,
-          UserType: 9
+        .post('/member/pub/sendSms', {
+          phone: this.mobile
         })
         .then(res => {
-          if (res.success) {
+          this.$toast(res.msg)
+          if (res.code == 1) {
             this.isShow = false
             var Timer = setInterval(() => {
               this.time--
@@ -94,7 +106,7 @@ export default {
         })
         .catch(err => {})
     },
-    sure() {
+    submit() {
       if (!this.mobile) {
         this.$toast('请输入电话')
         return
@@ -112,35 +124,23 @@ export default {
         return
       }
       this.$http
-        .post('/api/Login/AuthenticateForgetPwd', {
-          Mobile: this.mobile,
-          SmsCode: this.smsCode,
-          UserType: 9
+        .post('/member/pub/findPwd', {
+          phone: this.mobile,
+          verify: this.smsCode,
+          password: this.pwd
         })
         .then(res => {
-          if (res.success) {
-            this.LOG_IN({
-              token: res.token,
-              userId: res.user.id
-            })
-
-            this.$http
-              .post('/api/Member/SetPwd', {
-                smsCode: this.smsCode,
-                pwd: this.pwd
-              })
-              .then(res => {
-                if (res.success) {
-                  this.$toast('密码修改成功，请重新登录')
-                  var timer = setInterval(() => {
-                    this.$router.push({ name: 'login' })
-                    window.clearInterval(timer)
-                  }, 1500)
-                }
-              })
-              .catch(err => {})
+          if (res.code == 1) {
+            this.$toast('密码修改成功，请重新登录')
+            var timer = setInterval(() => {
+              this.$router.push({ name: 'login' })
+              window.clearInterval(timer)
+            }, 1500)
+          } else {
+            this.$toast(res.msg)
           }
         })
+        .catch(err => {})
     }
   },
   created() {},
@@ -148,25 +148,75 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-.warner {
-  padding-top: 12px;
-}
-.top {
-  font-size: 1.2rem;
-  height: 4.1rem;
-  width: 28rem;
-  background: #f5f5f5;
-  margin: 1.3rem auto;
-  text-align: center;
-  line-height: 4.1rem;
-  color: #999;
-}
-.btnBot {
-  width: 100%;
-  position: fixed;
-  bottom: 0;
+.forgetBody {
+  padding: 0 .533333rem;
+  position: absolute;
+  top: 0;
   left: 0;
-  font-size: 1.4rem;
+  right: 0;
+  bottom: 0;
+  min-height: 500px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+.red {
+  color: #ff5f5f;
+}
+.mid {
+  // height: 300px;
+  display: flex;
+  flex-direction: column;
+  font-size: .4rem;
+  .ipt {
+    flex: 1;
+    height: 0.9rem;
+    border: none;
+  }
+  .short {
+    width: 3.333333rem;
+  }
+  .mid-account{
+    margin-top: .2rem;
+    display: flex;
+    border-bottom: .013333rem solid rgb(221, 221, 221);
+    > span {
+      width: 2.4rem;
+      line-height: 1rem;
+      text-align: left;
+    }
+    .van-button {
+      margin: .106667rem 0;
+    }
+    .van-button--small {
+      min-width: 1.133333rem;
+    }
+  }
+  
+}
+.mid-btn {
+  align-items: center;
+  font-size: .4rem;
+  margin: 0 1.066667rem;
+  button {
+    height: 1.066667rem;
+    width: 6.853333rem;
+    border-radius: .533333rem;
+    background: #03d13e;
+    color: #fff;
+    border: none;
+  }
+  button:active {
+    color: #03d13e;
+    background: #fff;
+    border: 1px solid #03d13e;
+  }
+  > div {
+    padding: .4rem;
+    color: #999;
+    font-size: .32rem;
+  }
+  
 }
 </style>
 
