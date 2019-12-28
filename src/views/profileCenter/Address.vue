@@ -6,18 +6,18 @@
       <van-radio-group class="group"
         v-model="radio">
         <div class="table"
-          v-for="(item, index) in 4"
+          v-for="(item, index) in addressList"
           :key="index"
           @click="toChose(item)">
           <div class="infeed">
-            <div>{{item.contact || '阿凡达大大大大大大大大大'}}</div>
-            <div>{{item.phone || '到发反反复复反反复复'}}</div>
+            <div>{{item.linkman}}</div>
+            <div>{{item.contact}}</div>
           </div>
-          <div class="address">{{item.area || '阿打发打发打分'}}<span>{{item.address || '爱的风格发电分公司发个'}}</span></div>
+          <div class="address">{{item.address_detail}}</div>
           <div class="infeed">
             <div class="choice"
               @click.stop="radioChange(item)">
-              <van-radio :name="item.id"
+              <van-radio :name="item.is_default"
                 checked-color="#40a3ff">默认地址</van-radio>
             </div>
             <div class="icon">
@@ -34,7 +34,7 @@
         </div>
       </van-radio-group>
       <div class="button"
-        @click="open">添加收货地址</div>
+        @click="open()">添加收货地址</div>
     </div>
   </div>
 </template>
@@ -44,13 +44,27 @@ export default {
   components: {
     publicHeader
   },
+  data() {
+    return {
+      radio: 1,
+      addressList: [],
+    }
+  },
+  mounted() {
+    this.getAddressList();
+  },
   methods: {
-    open(item) {
+    // 获取地址列表
+    getAddressList() {
+      this.$http.get('/member/address/lists').then(res => {
+        this.addressList = res.data.list;
+        this.radio = 1;
+      }).catch(() => {})
+    },
+    open(item) {      
       this.$router.push({
         name: 'AddressAdd',
-        query: {
-          id: item.id
-        }
+        query: {item: item}
       })
     },
     
@@ -68,13 +82,13 @@ export default {
           msg: '未找到地址信息'
         })
       }
-      this.$http.post('/api/MemberAddress/SetDefualt', {
-          id: value.id
-        })
-        .then(res => {
-          this.getData()
-        })
-        .catch(err => {})
+      this.$http.post('/member/address/setDef', {
+        id: value.id
+      })
+      .then(res => {
+        this.getAddressList()
+      })
+      .catch(err => {})
     },
     // 删除地址
     async del(id,contact) {
@@ -83,11 +97,13 @@ export default {
           title: '确定要删除该收货地址吗'
         })
         .then(() => {
-          this.$http.post('/api/MemberAddress/Delete', {
+          this.$http.post('/member/address/del', {
             id: id
           }).then(res => {
-            this.$toast('地址已删除')
-            this.getData()
+            this.getAddressList();
+            setTimeout(() => {
+              this.$toast('地址已删除')
+            },500)
           }).catch(err =>{})
         })
         .catch(() => {
@@ -99,7 +115,7 @@ export default {
 </script>
 <style lang="scss" scoped>
 .wrapper {
-  min-height: 580px;
+  min-height: 500px;
   background: white;
 }
 .body {
@@ -108,7 +124,7 @@ export default {
   overflow: scroll;
 }
 .table {
-  // margin-top: 0.1rem;
+  border-bottom: 5px solid #f5f5f5;
   background-color: white;
   padding: .4rem .533333rem;
 }

@@ -1,7 +1,7 @@
 <template>
   <div class="warpper">
     <publicHeader name="购物车" rightMethod="删除选中" @clickRight="doDelGood"></publicHeader>
-    <div class="carBody">
+    <div class="carBody" v-if="carGoods.length > 0">
       <div v-for="(item,index) in carGoods" :key="index" @click="jumpPage(item)" class="carGoods">
         <div @click="checkOne(item)">
           <van-checkbox v-model="item.is_sel" 
@@ -26,7 +26,16 @@
         </div>
       </div>
     </div>
-    <carBottom :is_all_sel="is_all_sel" :total="total" @selectAll="selectAll"></carBottom>
+    <div v-else class="kong">
+      <img src="@/assets/index/none.png" width="100" alt="">
+      <div>购物车空空如也</div>
+    </div>
+    <carBottom 
+      :is_all_sel="is_all_sel"  
+      :total="total" 
+      :is_other_sel="is_other_sel"
+      @selectAll="selectAll">
+    </carBottom>
     <tabbar :cardno="cardno"></tabbar>
   </div>
 </template>
@@ -47,7 +56,8 @@ export default {
       box: true,
       carGoods: {},
       is_all_sel: 0,
-      total: 0
+      total: 0,
+      is_other_sel: 0
     }
   },
   mounted() {
@@ -59,7 +69,8 @@ export default {
       this.$http.get('/member/carts/lists').then(res => {
         this.carGoods = res.data.myCart.list;  
         this.is_all_sel = res.data.myCart.is_all_sel;
-        this.total = res.data.myCart.total;   
+        this.total = res.data.myCart.total; 
+        this.is_other_sel = res.data.myCart.is_other_sel;  
       }).catch(() =>{})
     },
     // 停止事件路由
@@ -133,6 +144,12 @@ export default {
 .money {
   font-size: .4rem;
   color: #ff5f5f;
+}
+.kong {
+  width: 8.96rem;
+  margin-top: 1rem;
+  color: #999;
+  text-align: center;
 }
 .carBody {
   .carGoods {

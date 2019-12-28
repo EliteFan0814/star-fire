@@ -237,6 +237,12 @@ export default new Router({
       name: 'UpgradeOrderApply',
       component: () => import('@/views/profileCenter/UpgradeOrderApply')
     },
+    // 升级订单 
+    // {
+    //   path: '/profileCenter/UpgradeOrder',
+    //   name: 'UpgradeOrder',
+    //   component: () => import('@/views/profileCenter/UpgradeOrder')
+    // },
     //  联系客服
     {
       path: '/profileCenter/Service',

@@ -42,11 +42,23 @@
   <div>
     <van-goods-action>
       <van-goods-action-icon icon="chat-o" text="客服"/>
-      <van-goods-action-icon icon="cart-o" text="购物车" @click="jumpToPage('car')" />
-      <van-goods-action-button type="warning" text="加入购物车" @click="addCar" />
-      <van-goods-action-button type="danger" text="立即购买" @click="jumpToPage('confirmOrderDh')" />
+      <van-goods-action-button  type="danger" text="立即购买" @click="showChoose = true" />
     </van-goods-action>
   </div>
+  
+  <van-popup
+    v-model="showChoose"
+    position="bottom"
+    round
+    :style="{ height: '21%' }">
+    <div class="popCls">
+      <div>请选择数量</div>
+      <div>
+        <van-stepper v-model="value" />
+        <van-button size="small" type="danger" @click="jumpToPage('confirmOrderDh')">提交订单</van-button>
+      </div>
+    </div>
+  </van-popup>
 </div>
 </template>
 <script>
@@ -57,6 +69,8 @@ export default {
   },
   data() {
     return {
+      value: 0, //购买数量
+      showChoose: false,
       id: '',
       item: {},
       bannerList: [],
@@ -73,7 +87,13 @@ export default {
       this.$router.go(-1);
     },
     jumpToPage(url) {
-      this.$router.push(url)
+      this.$router.push({
+        name: url,
+        query: {
+          goods_id: this.item.id,
+          goods_num: this.value
+        }
+      })
     },
     addCar() {
 
@@ -183,6 +203,18 @@ export default {
         margin-right: .2rem;
       }
     }
+  }
+}
+.popCls {
+  font-size: .48rem;
+  padding: .3rem 1rem;
+  text-align: center;
+  > :first-child {
+    height: 1.5rem;
+  }
+  > :last-child {
+    display: flex;
+    justify-content: space-between;
   }
 }
 </style>

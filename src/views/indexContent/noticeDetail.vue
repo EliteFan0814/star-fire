@@ -12,20 +12,35 @@ export default {
   },
   data() {
     return {
+      id: '',
       content: ''
     }
   },
-  created() {},
+  created() {
+    this.id = this.$route.query.id;
+    this.getData();
+  },
   methods: {
+    getData() {
+      this.$http.get('/member/article/info?id=' + this.id).then(res => {
+        this.content = res.data.info.content;
+      }).catch(() =>{})
+    },
     jumpToPage(url) {
       this.$router.push(url)
     }
   },
 }
 </script>
-<style lang="scss" scoped>
+<style lang="scss">
 .noticeMain {
-  padding: .3rem .5rem;
   font-size: .36rem;
+  > div {
+    img {
+      width: 10rem;
+      height: auto;
+    }
+  }
+  
 }
 </style>

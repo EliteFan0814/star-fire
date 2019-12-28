@@ -21,7 +21,7 @@
         </div>
         <div class="card-btm card-all">
           <span>审核状态：待审核</span>
-          <span class="check-text">点击查看<span>&nbsp;&gt;</span></span>
+          <span class="check-text" @click="checkUp">点击查看<span>&nbsp;&gt;</span></span>
         </div>
       </div>
       <div class="up-card">
@@ -34,33 +34,7 @@
         </div>
         <div class="card-btm card-all">
           <span>审核状态：待提交</span>
-          <span class="check-text">点击查看<span>&nbsp;&gt;</span></span>
-        </div>
-      </div>
-      <div class="up-card">
-        <div class="card-top card-all">
-          <span class="bold-text">升级确认</span>
-          <span class="red-text">￥90.00</span>
-        </div>
-        <div class="card-middle card-all">
-          <span>订单号：20191225025</span>
-        </div>
-        <div class="card-btm card-all">
-          <span>审核状态：待提交</span>
-          <span class="check-text">点击查看<span>&nbsp;&gt;</span></span>
-        </div>
-      </div>
-      <div class="up-card">
-        <div class="card-top card-all">
-          <span class="bold-text">升级确认</span>
-          <span class="red-text">￥90.00</span>
-        </div>
-        <div class="card-middle card-all">
-          <span>订单号：20191225025</span>
-        </div>
-        <div class="card-btm card-all">
-          <span>审核状态：待提交</span>
-          <span class="check-text">点击查看<span>&nbsp;&gt;</span></span>
+          <span class="check-text" @click="checkUp">点击查看<span>&nbsp;&gt;</span></span>
         </div>
       </div>
     </div>
@@ -72,6 +46,11 @@ import publicHeader from '@/components/publicHeader'
 export default {
   components: {
     publicHeader
+  },
+  methods: {
+    checkUp() {
+      this.$router.push({ name: 'UpgradeOrderApply' })
+    }
   }
 }
 </script>
@@ -124,7 +103,7 @@ export default {
         .red-text {
           color: #ff5f5f;
         }
-        .check-text{
+        .check-text {
           color: #03d13e;
         }
       }

@@ -2,12 +2,6 @@
   <div class="my-order">
     <publicHeader :icon="true" name="我的订单"></publicHeader>
     <div class="top-nav">
-      <!-- <div class="top-slogin">
-        <van-row>
-          <van-col span="1" offset="1"><img class="out-img" src="@/assets/personal/out.png" alt="" srcset=""></van-col>
-          <van-col span="8" offset="6"><span class="check-in">我的订单</span></van-col>
-        </van-row>
-      </div> -->
       <div class="top-btn-list">
         <van-row>
           <van-col span="6" offset="6"><span :class="{'top-btn-active':mallActive}" @click="changeOrder('mall')">商城订单</span></van-col>
@@ -89,9 +83,13 @@ export default {
   },
   created() {
     // this.getOrderList()
+    if (this.$route.query.queryClass) {
+      this.activeTab = this.$route.query.queryClass
+    }
   },
   methods: {
     changeOrder(value) {
+      this.activeTab = ''
       if (value === 'mall') {
         this.mallActive = true
         this.isExchangeOrder = false

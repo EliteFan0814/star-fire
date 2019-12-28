@@ -89,6 +89,9 @@ export default {
     if (this.$route.query.accountClass) {
       this.upData.type = this.$route.query.accountClass
     }
+    if (this.$route.query.classClass) {
+      this.upData.class = this.$route.query.classClass
+    }
     // console.log(this.$route)
   },
   methods: {
@@ -101,7 +104,7 @@ export default {
           this.class_screen = res.data.class_screen
           if (res.data.list.length) {
             // 异步更新数据
-             this.billList.push(...res.data.list)
+            this.billList.push(...res.data.list)
             // this.pushBillListItem(res.data.list)
             // 数据全部加载完成
             this.upData.page++

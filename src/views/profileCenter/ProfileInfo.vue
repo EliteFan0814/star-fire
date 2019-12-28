@@ -6,7 +6,7 @@
         <div class="setting-profile">
           <div class="left-avatar">
             <div class="inner-avatar">
-              <img v-if="info.thumb" :src="info.thumb" alt="avatar">
+              <img v-if="info.picurl" :src="info.picurl" alt="avatar">
               <img v-else src="@/assets/index/logo.png" alt="avatar">
             </div>
             <div class="up-img-btn">
@@ -77,6 +77,7 @@ export default {
           .then(res => {
             if (res.code === 1) {
               this.info.thumb = res.data.fileurl
+              this.info.picurl = res.data.fileurl_str
             }
           })
           .catch(err => {})

@@ -2,7 +2,7 @@
 <div class="noticeMain">
   <publicHeader :icon="true" name="平台公告"></publicHeader>
   <div class="noticeDiv" v-for="(item, index) in noticeList">
-    <van-cell :title="item.title" is-link @click="jumpToPage('noticeDetail')"/>
+    <van-cell :title="item.title" is-link @click="jumpToPage('noticeDetail',item.id)"/>
   </div>
 </div>
 </template>
@@ -22,8 +22,11 @@ export default {
     this.getArticleList()
   },
   methods: {
-    jumpToPage(url) {
-      this.$router.push(url)
+    jumpToPage(url, id) {
+      this.$router.push({
+        name: url,
+        query: {id: id}
+      })
     },
     getArticleList() {
       this.$http.get('/member/article/lists', {

@@ -45,10 +45,37 @@
     <van-goods-action>
       <van-goods-action-icon icon="chat-o" text="客服" />
       <van-goods-action-icon icon="cart-o" text="购物车" @click="jumpToPage('car')" />
-      <van-goods-action-button type="warning" text="加入购物车" @click="addCarGoods" />
-      <van-goods-action-button type="danger" text="立即购买" @click="jumpToPage('confirmOrder')" />
+      <van-goods-action-button type="warning" text="加入购物车" @click="showChooseCar = true" />
+      <van-goods-action-button type="danger" text="立即购买" 
+        @click="showChoose = true" />
     </van-goods-action>
   </div>
+  <van-popup
+    v-model="showChoose"
+    position="bottom"
+    round
+    :style="{ height: '21%' }">
+    <div class="popCls">
+      <div>请选择数量</div>
+      <div>
+        <van-stepper v-model="value" />
+        <van-button size="small" type="danger" @click="jumpToPage('confirmOrder')">提交订单</van-button>
+      </div>
+    </div>
+  </van-popup>
+  <van-popup
+    v-model="showChooseCar"
+    position="bottom"
+    round
+    :style="{ height: '21%' }">
+    <div class="popCls">
+      <div>请选择数量</div>
+      <div>
+        <van-stepper v-model="value" />
+        <van-button size="small" type="danger" @click="addCarGoods">添加购物车</van-button>
+      </div>
+    </div>
+  </van-popup>
 </div>
 </template>
 <script>
@@ -60,8 +87,11 @@ export default {
   data() {
     return {
       id: '',
-      item: {},
-      bannerList: [],
+      item: {}, //商品详情
+      bannerList: [], //顶部轮播图
+      showChoose: false, //选择数量弹框
+      showChooseCar: false,
+      value: 0, //购买商品数量
     }
   },
   created() {
@@ -74,7 +104,15 @@ export default {
       this.$router.go(-1);
     },
     jumpToPage(url) {
-      this.$router.push(url)
+      this.$router.push({
+        name: url,
+        query: {
+          type: 'goods',
+          num: this.value,
+          goods_id: this.item.id
+        }  
+      });
+      this.showChoose = false;
     },
     getGoodsDetails() {
       this.$http.get('/member/goods/info?id='+this.id).then(res => {
@@ -86,11 +124,12 @@ export default {
       this.$http.get('/member/carts/edit',{
         params: {
           goods_id: this.item.id,
-          num: 1
+          num: this.value
         }
       }).then(res => {
         if(res.code == 1) {
           this.$toast('已加入购物车')
+          this.showChooseCar = false;
         } else {
           this.$toast(res.msg)
         }
@@ -196,6 +235,18 @@ export default {
         margin-right: .2rem;
       }
     }
+  }
+}
+.popCls {
+  font-size: .48rem;
+  padding: .3rem 1rem;
+  text-align: center;
+  > :first-child {
+    height: 1.5rem;
+  }
+  > :last-child {
+    display: flex;
+    justify-content: space-between;
   }
 }
 </style>

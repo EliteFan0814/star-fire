@@ -5,10 +5,10 @@
     <div class="pay">
       <div class="all-pay ali-pay">
         <div class="pay-wrapper">
-          <div class="account"><span class="left-text">账号：</span><span>zsd_452213</span></div>
-          <div class="account"><span class="left-text">手机号：</span><span>121212121212</span></div>
-          <div class="account"><span class="left-text">姓名：</span><span>士大夫大师傅</span></div>
-          <div class="change" @click="setChange"><span>修改</span>
+          <div class="account"><span class="left-text">支付宝账号：</span><span>{{aliAccount.account}}</span></div>
+          <div class="account"><span class="left-text">手机号：</span><span>{{aliAccount.phone}}</span></div>
+          <div class="account"><span class="left-text">姓名：</span><span>{{aliAccount.realname}}</span></div>
+          <div class="change" @click="setChange('ALI')"><span>修改</span>
             <van-icon name="arrow" />
           </div>
         </div>
@@ -17,10 +17,10 @@
     <div class="pay last-pay">
       <div class="all-pay we-pay">
         <div class="pay-wrapper">
-          <div class="account"><span class="left-text">账号：</span><span>zsd_452213</span></div>
-          <div class="account"><span class="left-text">手机号：</span><span>121212121212</span></div>
-          <div class="account"><span class="left-text">姓名：</span><span>士大夫大师傅</span></div>
-          <div class="change" @click="setChange"><span>修改</span>
+          <div class="account"><span class="left-text">微信账号：</span><span>{{wxAccount.account}}</span></div>
+          <div class="account"><span class="left-text">手机号：</span><span>{{wxAccount.phone}}</span></div>
+          <div class="account"><span class="left-text">姓名：</span><span>{{wxAccount.realname}}</span></div>
+          <div class="change" @click="setChange('WX')"><span>修改</span>
             <van-icon name="arrow" />
           </div>
         </div>
@@ -35,9 +35,33 @@ export default {
   components: {
     publicHeader
   },
+  data() {
+    return {
+      wxAccount: {},
+      aliAccount: {}
+    }
+  },
+  created() {
+    this.getAccountList()
+  },
   methods: {
-    setChange() {
-      this.$router.push({name:'SettingsChange'})
+    setChange(account) {
+      this.$router.push({
+        name: 'SettingsChange',
+        query: { account }
+      })
+    },
+    getAccountList() {
+      this.$http.get('/member/cash_account/lists').then(res => {
+        res.data.list.map(item => {
+          if (item.type === 'WX') {
+            this.wxAccount = item
+          }
+          if (item.type === 'ALI') {
+            this.aliAccount = item
+          }
+        })
+      })
     }
   }
 }
@@ -46,10 +70,10 @@ export default {
 <style lang="scss" scoped>
 .pay {
   border-top: 1px solid transparent;
-  .ali-pay{
+  .ali-pay {
     background-image: url(../../assets/personal/alipay.png);
   }
-  .we-pay{
+  .we-pay {
     background-image: url(../../assets/personal/wepay.png);
   }
 }
@@ -78,7 +102,7 @@ export default {
       .left-text {
         display: inline-block;
         // border: 1px solid red;
-        width: 2rem;
+        width: 2.4rem;
         text-align: right;
       }
     }
@@ -94,7 +118,7 @@ export default {
     }
   }
 }
-.last-pay{
- margin-top: 0; 
+.last-pay {
+  margin-top: 0;
 }
 </style>

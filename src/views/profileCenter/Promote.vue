@@ -9,9 +9,11 @@
     </div>
     <div class="bgBody">
       <div>
-        <img class="yhImg" src="@/assets/index/logo.png" alt="">
+        <img class="yhImg"  alt=""
+        :src="info.picurl || require('@/assets/index/logo.png')"
+        @error="info.picurl = require('@/assets/index/logo.png')">
       </div>
-      <div>哈撒及</div>
+      <div>{{info.nickname}}</div>
       <div>
         <img src="@/assets/personal/mxczltf.png" alt="">
       </div>
@@ -20,18 +22,18 @@
       </div>
       <div>
         <img src="@/assets/personal/ewmk.png" alt="">
-        <img src="@/assets/index/1.png" alt="">       
+        <img :src="info.qrcode_str" alt="">       
       </div>
       <div>
         <div style="font-size: 18px; color: #333;">您的邀请码</div>
-        <van-button class="tgBtn" size="small">VPD454</van-button>
+        <van-button class="tgBtn" size="small">{{info.spread_code}}</van-button>
         <div>        
           <img src="@/assets/personal/mfzc.png" alt="">       
         </div>
         <div class="wenzi">
-          <p>阿迪噶发大水该罚的罚</p>
-          <p>阿迪噶发大水该罚的罚</p>
-          <p>阿迪噶发大水该罚的罚</p>          
+          <p>每日签到送{{param.register_jifen}}积分</p>
+          <p>推荐成功送{{param.tuijian_jifen}}积分</p>
+          <p>积分可在兑换专区兑换产品</p>          
         </div>
       </div>
     </div>
@@ -48,10 +50,13 @@ export default {
   },
   data() {
     return {
-      opacity: 1
+      opacity: 1,
+      info: {},
+      param: {}
     }
   },
   mounted() {
+    this.getData();
     this.scrollListen();
   },
   methods: {
@@ -62,6 +67,12 @@ export default {
       window.addEventListener('scroll',() => {
         this.opacity = 1 - ((document.documentElement.scrollTop || document.body.scrollTop) / 50)        
       })
+    },
+    getData() {
+      this.$http.get('/member/member/info').then(res => {
+        this.info = res.data.info || {};
+        this.param = res.data.param || {};
+      }).catch(() => {})
     }
   },
 }

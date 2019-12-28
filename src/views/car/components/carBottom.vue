@@ -8,17 +8,26 @@
     <div>共计：</div>
     <div class="totalMoney">￥{{total}}</div>
     <div>
-      <van-button round size="small" class="btmBtn" color="#03d13e">去 结 算</van-button>
+      <van-button round size="small" class="btmBtn" @click="submit" color="#03d13e">去 结 算</van-button>
     </div>
   </div>
 </div>
 </template>
 <script>
 export default {
-  props: ['is_all_sel', 'total'],
+  props: ['is_all_sel', 'total', 'is_other_sel'],
   methods: {
     selectAll() {
       this.$emit('selectAll');
+    },
+    submit() {
+      if(this.is_other_sel != 1){
+        return this.$toast('请至少选中一个订单')
+      }
+      this.$router.push({
+        name: 'confirmOrder',
+        query: {type: 'car'}
+      })
     }
   }
 }

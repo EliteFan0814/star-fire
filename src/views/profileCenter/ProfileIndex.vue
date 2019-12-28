@@ -42,30 +42,30 @@
       <!-- 余额列表 -->
       <div class="balance-list">
         <van-row>
-          <van-col span="7">
+          <van-col span="6">
             <div class="balance-item" @click="toNextPage('Bill','point')">
               <div class="balance-value">{{info.point}}</div>
               <div class="balance-unit">积分</div>
             </div>
           </van-col>
-          <van-col span="10">
+          <van-col span="6">
             <div class="balance-item" @click="toNextPage('Bill','reward')">
-              <div class="balance-value">{{info.reward}}</div>
-              <div class="balance-unit">推广总收益（积分）</div>
+              <div class="balance-value">{{info.bill_fh}}</div>
+              <div class="balance-unit">佣金</div>
             </div>
           </van-col>
-          <van-col span="7">
-            <div class="balance-item last-item" @click="toNextPage('Bill','amount')">
+          <van-col span="6">
+            <div class="balance-item" @click="toNextPage('Bill','amount')">
               <div class="balance-value">{{info.amount}}</div>
               <div class="balance-unit">余额（元）</div>
             </div>
           </van-col>
-          <!-- <van-col span="6">
-            <div class="balance-item last-item">
-              <div class="balance-value">30</div>
-              <div class="balance-unit">积分（元）</div>
+          <van-col span="6">
+            <div class="balance-item last-item" @click="toNextPage('Bill','reward','fy')">
+              <div class="balance-value">{{info.reward}}</div>
+              <div class="balance-unit">推广总收益</div>
             </div>
-          </van-col> -->
+          </van-col>
         </van-row>
       </div>
 
@@ -101,22 +101,22 @@
         </van-col>
         <van-col span="22" offset="1">
           <div class="order-img-list">
-            <div class="img-item" @click="toNextPage('Order')">
+            <div class="img-item" @click="toNextPage('Order',1)">
               <img src="@/assets/personal/deliver.png" alt="">
               <span>待发货</span>
             </div>
-            <div class="img-item" @click="toNextPage('Order')">
+            <div class="img-item" @click="toNextPage('Order',2)">
               <img src="@/assets/personal/receive.png" alt="">
               <span>待收货</span>
             </div>
-            <div class="img-item" @click="toNextPage('Order')">
+            <div class="img-item" @click="toNextPage('Order',3)">
               <img src="@/assets/personal/complete.png" alt="">
-              <span>已完成</span>
+              <span>已完结</span>
             </div>
-            <div class="img-item" @click="toNextPage('Order')">
+            <!-- <div class="img-item" @click="toNextPage('Order')">
               <img src="@/assets/personal/failed.png" alt="">
               <span>交易终止</span>
-            </div>
+            </div> -->
           </div>
         </van-col>
       </van-row>
@@ -173,6 +173,9 @@
         <van-cell title="升级记录" is-link @click="toNextPage('UpgradeOrderRecord')">
           <img slot="icon" class="other-list-img" src="@/assets/personal/my-up-record.png" />
         </van-cell>
+        <!-- <van-cell title="升级订单" is-link @click="toNextPage('UpgradeOrder')">
+          <img slot="icon" class="other-list-img" src="@/assets/personal/my-up-record.png" />
+        </van-cell> -->
       </div>
 
       <!-- 05 收货地址-->
@@ -226,10 +229,10 @@ export default {
           console.log(err)
         })
     },
-    toNextPage(routerName, accountClass) {
+    toNextPage(routerName, accountClass, classClass) {
       this.$router.push({
         name: routerName,
-        query: { accountClass: accountClass }
+        query: { accountClass, classClass }
       })
     }
   }
