@@ -69,6 +69,12 @@ export default new Router({
       name: 'confirmOrder',
       component: () => import('@/views/order/confirmOrder')
     },
+    // 订单详情
+    {
+      path: '/orderDetails',
+      name: 'orderDetails',
+      component: () => import('@/views/order/orderDetails')
+    },
     // 兑换专区
     {
       path: '/exchange',
@@ -86,6 +92,12 @@ export default new Router({
       path: '/confirmOrderDh',
       name: 'confirmOrderDh',
       component: () => import('@/views/order/confirmOrderDh')
+    },
+    // 兑换订单详情
+    {
+      path: '/orderDetailsDh',
+      name: 'orderDetailsDh',
+      component: () => import('@/views/order/orderDetailsDh')
     },
     // 首页公告
     {
@@ -153,11 +165,17 @@ export default new Router({
       name: 'ProfileInfoPwd',
       component: () => import('@/views/profileCenter/ProfileInfoPwd')
     },
-    //  个人信息 > 修改手机
+    //  个人信息 > 验证原手机
     {
       path: '/profileCenter/ProfileInfoPhone',
       name: 'ProfileInfoPhone',
       component: () => import('@/views/profileCenter/ProfileInfoPhone')
+    },
+    //  个人信息 > 验证原手机 > 验证新手机
+    {
+      path: '/profileCenter/ProfileInfoPhoneNew',
+      name: 'ProfileInfoPhoneNew',
+      component: () => import('@/views/profileCenter/ProfileInfoPhoneNew')
     },
     //  充值
     {
@@ -212,6 +230,12 @@ export default new Router({
       path: '/profileCenter/SettingsChange',
       name: 'SettingsChange',
       component: () => import('@/views/profileCenter/SettingsChange')
+    },
+    //  我的兑换券
+    {
+      path: '/profileCenter/ExchangeCard',
+      name: 'ExchangeCard',
+      component: () => import('@/views/profileCenter/ExchangeCard')
     },
     //  我要升级
     {

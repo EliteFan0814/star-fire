@@ -2,104 +2,73 @@
   <div class="up-record">
     <publicHeader :icon="true" name="升级记录"></publicHeader>
     <!-- 审核中的凭证 -->
-    <div class="record-item">
-      <div class="top-arrow">
-        <span class="checking">一级区县代理</span>
-        <img src="@/assets/personal/checking.png" alt="">
-        <span class="checking">二级市级代理</span>
-      </div>
-      <div class="record-common">
-        <span>会员账号</span>
-        <span>15287458996</span>
-      </div>
-      <div class="record-common">
-        <span>已支付（元）</span>
-        <span>100.00</span>
-      </div>
-      <div class="record-common">
-        <span class="checking">提交时间</span>
-        <span class="checking">2019年12月19日 14时22分</span>
-      </div>
-      <div class="rcord-btm">
-        <div class="left-proof">
-          <span>支付凭证</span>
-          <img src="@/assets/personal/checking-img.png" alt="">
+    <div v-if="list.length > 0">
+      <div v-for="item in list" :key="item.id">
+        <div class="record-item" v-if="item.status == 0">
+          <div class="top-arrow">
+            <span class="checking">{{item.level_from_str}}</span>
+            <img src="@/assets/personal/checking.png" alt="">
+            <span class="checking">{{item.level_to_str}}</span>
+          </div>
+          <div class="record-common">
+            <span>已支付（元）</span>
+            <span>{{item.money}}</span>
+          </div>
+          <div class="record-common">
+            <span class="checking">提交时间</span>
+            <span class="checking">{{item.create_time}}</span>
+          </div>
+          <!-- <div class="rcord-btm">
+            <div class="left-proof">
+              <span>支付凭证</span>
+              <img src="@/assets/personal/checking-img.png" alt="">
+            </div>
+            <div class="right-img">
+              <img :src="item.picurl" @click="showImages(item)" alt="">
+              <img :src="item.picurl" @click="showImages(item)" alt="">
+            </div>
+          </div> -->
         </div>
-        <div class="right-img">
-          <img src="@/assets/personal/check-def.png" alt="">
-          <img src="@/assets/personal/check-def.png" alt="">
-        </div>
-      </div>
-    </div>
-    <!--  审核通过的凭证 -->
-    <div class="record-item">
-      <div class="top-arrow">
-        <span class="checked">一级区县代理</span>
-        <img src="@/assets/personal/checked.png" alt="">
-        <span class="checked">二级市级代理</span>
-      </div>
-      <div class="record-common">
-        <span>会员账号</span>
-        <span>15287458996</span>
-      </div>
-      <div class="record-common">
-        <span>已支付（元）</span>
-        <span>100.00</span>
-      </div>
-      <div class="record-common">
-        <span class="checked">提交时间</span>
-        <span class="checked">2019年12月19日 14时22分</span>
-      </div>
-      <div class="record-common">
-        <span class="checked">同意时间</span>
-        <span class="checked">2019年12月19日 14时28分</span>
-      </div>
-      <div class="rcord-btm">
-        <div class="left-proof">
-          <span>支付凭证</span>
-          <img src="@/assets/personal/checked-img.png" alt="">
-        </div>
-        <div class="right-img">
-          <img src="@/assets/personal/check-def.png" alt="">
-          <img src="@/assets/personal/check-def.png" alt="">
+        <!--  审核通过的凭证 -->
+        <div class="record-item" v-if="item.status == 1">
+          <div class="top-arrow">
+            <span class="checked">{{item.level_from_str}}</span>
+            <img src="@/assets/personal/checked.png" alt="">
+            <span class="checked">{{item.level_to_str}}</span>
+          </div>
+          <div class="record-common">
+            <span>已支付（元）</span>
+            <span>{{item.money}}</span>
+          </div>
+          <div class="record-common">
+            <span class="checked">提交时间</span>
+            <span class="checked">{{item.create_time}}</span>
+          </div>
+          <div class="record-common">
+            <span class="checked">同意时间</span>
+            <span class="checked">{{item.check_time}}</span>
+          </div>
+          <div class="rcord-btm">
+            <div class="left-proof">
+              <span>支付凭证</span>
+              <img src="@/assets/personal/checked-img.png" alt="">
+            </div>
+            <div class="right-img">
+              <img :src="item.check_voucher1" @click="showImages(item)" alt="">
+              <img :src="item.check_voucher2" @click="showImages(item)" alt="">
+            </div>
+          </div>
         </div>
       </div>
     </div>
-    <!-- 审核失败的凭证 -->
-    <div class="record-item">
-      <div class="top-arrow">
-        <span class="check-filed">一级区县代理</span>
-        <img src="@/assets/personal/checkfiled.png" alt="">
-        <span class="check-filed">二级市级代理</span>
-      </div>
-      <div class="record-common">
-        <span>会员账号</span>
-        <span>15287458996</span>
-      </div>
-      <div class="record-common">
-        <span>已支付（元）</span>
-        <span>100.00</span>
-      </div>
-      <div class="record-common">
-        <span class="check-filed">提交时间</span>
-        <span class="check-filed">2019年12月19日 14时22分</span>
-      </div>
-      <div class="record-common">
-        <span class="check-filed">拒绝时间</span>
-        <span class="check-filed">2019年12月19日 14时28分</span>
-      </div>
-      <div class="rcord-btm">
-        <div class="left-proof">
-          <span>支付凭证</span>
-          <img src="@/assets/personal/checkfiled-img.png" alt="">
-        </div>
-        <div class="right-img">
-          <img src="@/assets/personal/check-def.png" alt="">
-          <img src="@/assets/personal/check-def.png" alt="">
-        </div>
-      </div>
+    <div v-else class="kong">
+      <img src="@/assets/index/none.png" width="100" alt="">
+      <div>暂无升级记录</div>
     </div>
-    <tabbar></tabbar>
+    <van-image-preview
+      v-model="show"
+      :images="images">
+    </van-image-preview>
   </div>
 </template>
 <script>
@@ -107,10 +76,39 @@ import publicHeader from '@/components/publicHeader'
 export default {
   components: {
     publicHeader
+  },
+  data() {
+    return {
+      list: [],
+      show: false,
+      images: []
+    }
+  },
+  created() {
+    this.getData();
+  },
+  methods: { 
+    getData() {
+      this.$http.get('/member/member_level/lists').then(res => {
+        this.list = res.data.lists;
+      })
+    },
+    showImages(item) {
+      this.images = [];
+      this.images.push(item.check_voucher1,item.check_voucher2);
+      this.show = true;
+    }
   }
 }
 </script>
 <style lang="scss" scoped>
+.kong {
+  width: 8.96rem;
+  margin-top: 1rem;
+  font-size: .28rem;
+  color: #999;
+  text-align: center;
+}
 .up-record {
   padding: 0.533333rem;
   padding-top: .013333rem;

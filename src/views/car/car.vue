@@ -102,13 +102,18 @@ export default {
     },
     // 删除商品
     doDelGood() {
+      if(this.is_other_sel == 0) {
+        return this.$toast('未选中任何商品 , 不能删除 !')
+      }
       this.$dialog.confirm({
         title: '提示',
         message: '确定要删除选中商品?'
       }).then(() => {
         this.$http.get('/member/carts/delSel').then(res => {
-          this.$toast('选中商品已删除')
           this.getCarGoods();
+          setTimeout(() => {
+            this.$toast('选中商品已删除')
+          },500)
         }).catch(() =>{})
       }).catch(() => {
         this.$toast('已取消删除')

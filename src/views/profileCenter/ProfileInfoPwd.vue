@@ -48,7 +48,10 @@ export default {
         this.$http
           .post('/member/member/chgPwd', { old: this.oldPwd, password: this.newPwd })
           .then(res => {
-            console.log(res)
+            if(res.code){
+              this.$toast.success(res.msg)
+              // this.$router.go(-1)
+            }
           })
       }
     }

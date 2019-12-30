@@ -3,38 +3,38 @@
     <publicHeader :icon="true" name="升级订单" right="升级记录" url="/profileCenter/UpgradeOrderRecord"></publicHeader>
     <div class="upgrading">
       <div class="up-top">
-        <span class="bold-text">V1区县代理升级</span>
-        <span class="up-process">进行中</span>
+        <span class="bold-text">升级为：{{level.level_to_str}}</span>
+        <span class="up-process">{{level.status_str}}</span>
       </div>
       <div class="up-time">
         <span>订单提交时间</span>
-        <span>2019年12月18日 10时20分</span>
+        <span>{{level.create_time}}</span>
       </div>
       <!-- 升级卡片 -->
       <div class="up-card">
         <div class="card-top card-all">
-          <span class="bold-text">升级申请</span>
-          <span class="red-text">￥10.00</span>
+          <span class="bold-text">{{businessApply.type_str}}升级审核</span>
+          <span class="red-text">￥{{businessApply.reward}}</span>
         </div>
         <div class="card-middle card-all">
-          <span>订单号：20191225025</span>
+          <span>订单号：{{businessApply.level_sn}}</span>
         </div>
         <div class="card-btm card-all">
-          <span>审核状态：待审核</span>
-          <span class="check-text" @click="checkUp">点击查看<span>&nbsp;&gt;</span></span>
+          <span>审核状态：{{businessApply.status_str}}</span>
+          <span class="check-text" @click="checkUp(businessApply.type,businessApply.id)">点击查看<span>&nbsp;&gt;</span></span>
         </div>
       </div>
       <div class="up-card">
         <div class="card-top card-all">
-          <span class="bold-text">升级确认</span>
-          <span class="red-text">￥90.00</span>
+          <span class="bold-text">{{memberApply.type_str}}升级审核</span>
+          <span class="red-text">￥{{memberApply.reward}}</span>
         </div>
         <div class="card-middle card-all">
-          <span>订单号：20191225025</span>
+          <span>订单号：{{memberApply.level_sn}}</span>
         </div>
         <div class="card-btm card-all">
-          <span>审核状态：待提交</span>
-          <span class="check-text" @click="checkUp">点击查看<span>&nbsp;&gt;</span></span>
+          <span>审核状态：{{memberApply.status_str}}</span>
+          <span class="check-text" @click="checkUp(memberApply.type,memberApply.id)">点击查看<span>&nbsp;&gt;</span></span>
         </div>
       </div>
     </div>
@@ -47,9 +47,41 @@ export default {
   components: {
     publicHeader
   },
+  data() {
+    return {
+      level: {},
+      applyList: [{ reward: '' }, { reward: '' }],
+      businessApply: {},
+      memberApply: {}
+    }
+  },
+  created() {
+    this.getData()
+  },
   methods: {
-    checkUp() {
-      this.$router.push({ name: 'UpgradeOrderApply' })
+    getData() {
+      this.$http
+        .get('/member/check_level/lst')
+        .then(res => {
+          if (res.code) {
+            this.level = res.data.level
+            res.data.list.map(item => {
+              if (item.type === 'business') {
+                this.businessApply = item
+              }
+              if (item.type === 'member') {
+                this.memberApply = item
+              }
+            })
+          }
+        })
+        .catch(err => {})
+    },
+    checkUp(applyType, applyId) {
+      this.$router.push({
+        name: 'UpgradeOrderApply',
+        query: { applyType, applyId }
+      })
     }
   }
 }

@@ -25,6 +25,10 @@ export default {
       type: Boolean,
       default: () => false
     },
+    jump: {
+      type: String,
+      default: ''
+    },
     right: {
       type: String,
       default: () => ''
@@ -43,7 +47,11 @@ export default {
   },
   methods: {
     backPage() {
-      this.$router.go(-1)
+      if(this.jump) {
+        this.$router.push(this.jump)
+      } else {
+        this.$router.go(-1)
+      }
     },
     clickRight() {
       this.$emit('clickRight')

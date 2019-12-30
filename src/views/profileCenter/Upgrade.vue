@@ -3,7 +3,7 @@
     <publicHeader :icon="true" name="代理升级"></publicHeader>
     <div class="top-bg">
       <div class="level-text">当前等级</div>
-      <div class="now-level">普通用户</div>
+      <div class="now-level">{{level}}</div>
     </div>
     <div class="riband">
       <span>代理等级与权益</span>
@@ -54,8 +54,29 @@ export default {
   components: {
     publicHeader
   },
+  data(){
+    return{
+      level:''
+    }
+  },
+  created(){
+    this.getLevel()
+  },
   methods:{
+    getLevel(){
+      this.$http.get('/member/member/info').then(res=>{
+        if(res.code){
+          console.log(res.data.info.level_str)
+          this.level = res.data.info.level_str
+        }
+      })
+    },
     nowUp(){
+      this.$http.post('/member/member_level/apply').then(res=>{
+        if(res.code){
+          this.$toast.success('升级申请成功！')
+        }
+      })
       this.$router.push({name:'UpgradeOrder'})
     }
   }

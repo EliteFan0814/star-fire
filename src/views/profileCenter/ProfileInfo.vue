@@ -17,9 +17,9 @@
           </div>
           <div class="right-info">
             <van-cell-group>
-              <van-field v-model="info.nickname" label="昵称：" placeholder="请输入昵称" />
-              <van-field v-model="info.realname" label="真实姓名：" placeholder="请输入姓名" />
-              <van-field v-model="info.wx_account" label="微信号：" placeholder="请输入微信号" />
+              <van-field clearable v-model="info.nickname" label="昵称：" placeholder="请输入昵称" />
+              <van-field clearable v-model="info.realname" label="真实姓名：" placeholder="请输入姓名" />
+              <van-field clearable v-model="info.wx_account" label="微信号：" placeholder="请输入微信号" />
             </van-cell-group>
           </div>
         </div>

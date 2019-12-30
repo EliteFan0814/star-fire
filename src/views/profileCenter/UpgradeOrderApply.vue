@@ -8,25 +8,27 @@
     </div>
     <div class="apply-form">
       <van-cell-group>
-        <van-cell title="订单编号" value="20191225058" />
+        <van-cell title="订单编号" :value="applyData.level_sn" />
         <van-cell>
-          <span slot="title">V1区县代理升级金额</span>
-          <span slot="default" class="warn-text">￥10.00</span>
+          <span slot="title">升级为{{applyData.level_to_str}}金额</span>
+          <span slot="default" class="warn-text">￥{{applyData.reward}}</span>
         </van-cell>
-        <van-cell is-link @click="showPopup">
+        <van-cell v-if="ifMember" is-link @click="showPopup">
           <span slot="title">支付方式</span>
           <span slot="default" class="warn-pay">{{splitWay}}</span>
         </van-cell>
-        <van-cell title="联系人姓名" value="范跑跑" />
-        <van-cell title="联系人电话" value="15874521114" />
-        <van-cell title="支付账号" value="sdg2548754" />
+        <van-cell title="联系人姓名" :value="applyData.check_info.realname || applyData.check_info.nickname" />
+        <van-cell title="联系人电话" :value="applyData.check_info.phone" />
+        <van-cell v-if="ifMember" title="支付账号" :value="finalAccount.account" />
         <van-popup v-model="show" position="bottom" :style="{ height: '35%' }">
-          <van-picker :columns="columns" :default-index="1" show-toolbar title="支付方式" @cancel="onCancel" @confirm="onConfirm" />
+          <van-picker :columns="columns" :default-index="0" show-toolbar title="支付方式" @cancel="onCancel" @confirm="onConfirm" />
         </van-popup>
       </van-cell-group>
     </div>
     <div class="pay-QR">
-      <img src="@/assets/personal/payQR.png" alt="">
+      <!-- <img src="@/assets/personal/payQR.png" alt=""> -->
+      <img  v-if="ifMember" :src="applyData.check_info.money_code_str" alt="">
+      <img  v-else :src="finalAccount.money_code_str" alt="">
       <span>支付时，请备注订单编号后四位</span>
     </div>
     <div class="up-img">
@@ -41,7 +43,7 @@
         <p>3.xxx规则说明xxxx规则说明xxxxxxxx</p>
       </div>
       <div class="btom-btn">
-        <van-button type="primary" size="large">提交审核</van-button>
+        <van-button type="primary" size="large" @click="upVerify">提交审核</van-button>
       </div>
     </div>
   </div>
@@ -56,16 +58,80 @@ export default {
   data() {
     return {
       show: false,
-      columns: ['支付宝', '微信', 'paypal'],
-      splitWay: '微信',
+      columns: ['支付宝', '微信'],
+      splitWay: '支付宝',
       splitBalance: '0.00',
       withdrawMoney: '',
-      fileList: []
+      fileList: [],
+      applyData: {},
+      upData: {
+        id: '',
+        voucher: ''
+      },
+      aliAccount: {},
+      weAccount: {},
+      finalAccount: {}
     }
   },
+  computed: {
+    ifMember() {
+      if (this.$route.query.applyType === 'member') {
+        return true
+      } else {
+        return false
+      }
+    }
+  },
+  created() {
+    this.getData(this.$route.query.applyId)
+    this.upData.id = this.$route.query.applyId
+  },
   methods: {
+    getData(id) {
+      this.$http
+        .get('/member/check_level/info', { params: { id } })
+        .then(res => {
+          console.log(res)
+          if (res.code) {
+            this.applyData = res.data
+            if (res.data.cash_account) {
+              res.data.cash_account.map(item => {
+                if (item.type === 'WX') {
+                  this.weAccount = item
+                }
+                if (item.type === 'ALI') {
+                  this.aliAccount = item
+                }
+              })
+              this.finalAccount = this.aliAccount
+            }
+          }
+        })
+    },
     afterRead(file) {
-      console.log(file)
+      if (file) {
+        let avatarFile = file.file
+        let form = new FormData()
+        form.append('file', avatarFile)
+        this.$http
+          .post('/member/image/upload', form)
+          .then(res => {
+            if (res.code === 1) {
+              // this.fileList[0] = res.data.fileurl_str
+              this.upData.voucher = res.data.fileurl
+            }
+          })
+          .catch(err => {})
+      }
+    },
+    upVerify() {
+      this.$http
+        .post('/member/check_level/voucher', { ...this.upData })
+        .then(res => {
+          if (res.code) {
+            this.$toast.success('提交审核成功！')
+          }
+        })
     },
     showPopup() {
       this.show = true
@@ -75,6 +141,14 @@ export default {
     },
     onConfirm(value, index) {
       this.splitWay = value
+      if (index === 0) {
+        this.finalAccount = this.aliAccount
+      }
+      if (index === 1) {
+        this.finalAccount = this.weAccount
+      }
+      console.log(this.finalAccount);
+      
       this.show = false
     }
   }
@@ -145,7 +219,7 @@ export default {
       }
     }
     .up-express {
-      margin-top: .4rem;
+      margin-top: 0.4rem;
       font-size: 0.32rem;
       line-height: 0.533333rem;
       color: #000000;
@@ -155,7 +229,7 @@ export default {
     }
     .btom-btn {
       text-align: center;
-      margin: .533333rem 0;
+      margin: 0.533333rem 0;
       button {
         width: 6.853333rem;
         height: 1.066667rem;

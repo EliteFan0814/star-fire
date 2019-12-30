@@ -13,16 +13,16 @@
     ></goods>
   </div>
   <infinite-loading
-      @infinite="getGoods"
-      :identifier="infiniteId"
-      direction="bottom"
-      style="font-size: .3rem;">
-      <div slot="spinner"class="whiteBg">读取中...</div>
-      <div slot="no-more" class="whiteBg">已加载全部</div>
-      <div slot="no-results" class="whiteBg" >
-        <p>暂无商品</p>
-      </div>
-    </infinite-loading>
+    :distance="distance"
+    @infinite="getGoods"
+    :identifier="infiniteId">
+    <div slot="spinner" class="whiteBg">读取中...</div>
+    <div slot="no-more" class="whiteBg">已加载全部</div>
+    <div slot="no-results" class="whiteBg" >
+      <img src="@/assets/index/none.png" width="100" style="margin-top: 20px" alt="">
+      <p>暂无商品</p>
+    </div>
+  </infinite-loading>
 </div>
 </template>
 <script>
@@ -39,7 +39,7 @@ export default {
       goodsList: [],
       infiniteId: +new Date(),
       fenlei: [],
-
+      distance: 100,
       page: 1,
     }
   },
@@ -48,7 +48,6 @@ export default {
       this.page = 1;
       this.goodsList = [];
       this.infiniteId += 1;
-      this.getGoods();
     }
   },
   created() {
@@ -73,12 +72,7 @@ export default {
         if (res.data.list.length) {
           this.page += 1;          
           this.goodsList.push(...res.data.list);
-          if(res.data.list.length<10){
-            $state.complete();
-          }
-          else{
-            $state.loaded();
-          }
+          $state.loaded();
         } else {
           $state.complete();
         }
@@ -96,5 +90,9 @@ export default {
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
+}
+.whiteBg {
+  color: #999;
+  font-size: 0.28rem;
 }
 </style>

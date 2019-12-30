@@ -1,6 +1,6 @@
 <template>
   <div class="my-order">
-    <publicHeader :icon="true" name="我的订单"></publicHeader>
+    <publicHeader :icon="true" name="我的订单" jump="ProfileIndex"></publicHeader>
     <div class="top-nav">
       <div class="top-btn-list">
         <van-row>
@@ -16,22 +16,41 @@
           <div class="order-item-wrapper" v-for="(item,index) in orderList" :key="index">
             <van-row>
               <van-col span="22" offset="1">
-                <div class="order-item">
-                  <img class="left-img" src="https://img.yzcdn.cn/vant/t-thirt.jpg" alt="">
-                  <div class="right-detail">
-                    <p class="good-feature">{{item.goods_order_item.name}}</p>
+                <div class="order-item" v-for="goods in item.goods_order_item">
+                  <img class="left-img" :src="goods.picurl" alt="">
+                  <div class="right-detail" @click="jumpToPage('orderDetails', item.order_id)">
+                    <p class="good-feature">{{goods.name}}</p>
                     <span class="trade-status">{{item.status_str}}</span>
                     <div class="price-num">
-                      <span class="good-price">价格：￥{{item.goods_order_item.final_price}}</span>
-                      <span class="good-num">数量：{{item.goods_order_item.buy_nums}}</span>
+                      <span class="good-price">价格：￥{{goods.final_price}}</span>
+                      <span class="good-num">数量：{{goods.buy_nums}}</span>
                     </div>
                   </div>
                 </div>
                 <div class="all-money">
                   <div class="left-total">合计：<span>￥{{item.orderfee}}</span></div>
                   <div class="right-btn">
-                    <van-button type="info" size="small">查看物流</van-button>
-                    <van-button type="primary" size="small">确认收货</van-button>
+                    <van-button 
+                    type="info" 
+                    size="small" 
+                    v-if="item.status == 1"
+                    @click="quxiao(item.order_id)">
+                      取消订单
+                    </van-button>
+                    <van-button 
+                    type="info" 
+                    size="small" 
+                    v-if="item.status == 2"
+                    @click="jumpToPage('orderDetails', item.order_id)">
+                      查看物流
+                    </van-button>
+                    <van-button 
+                    type="primary" 
+                    v-if="item.status == 2"
+                    size="small" 
+                    @click="shouhuo(item.order_id)">
+                      确认收货
+                    </van-button>
                   </div>
                 </div>
               </van-col>
@@ -42,8 +61,11 @@
     </div>
     <infinite-loading :distance="distance" :identifier="infiniteId" @infinite="infiniteHandler">
       <div class="infinite-toast" slot="spinner">小弟拼命加载中...</div>
-      <div class="infinite-toast" slot="no-more">已加载完毕!</div>
-      <div class="infinite-toast" slot="no-results">暂无数据:(</div>
+      <div class="infinite-toast" slot="no-more">已加载完毕</div>
+      <div class="infinite-toast" slot="no-results">
+        <img src="@/assets/index/none.png" width="100" style="margin-top: 20px" alt="">
+        <p>暂无数据</p>
+      </div>
     </infinite-loading>
   </div>
 </template>
@@ -123,6 +145,48 @@ export default {
       let res = [{ label: className, value: '' }]
       res.push(...inData)
       return res
+    },
+    // 取消订单
+    quxiao(order_id) {
+      this.$dialog.confirm({
+        title: '提示',
+        message: '确定要取消订单吗 ?'
+      }).then(res => {
+        this.$http.post('/member/goods_order/cancel',{
+          order_id: order_id
+        }).then(res => {
+          this.upData.page = 1
+          this.orderList = []
+          this.infiniteId++
+          setTimeout(()=> {
+            this.$toast('订单已取消');
+          },500)
+        }).catch(() => {})
+      }).catch(() => {})
+    },
+    // 确认收货
+    shouhuo(order_id) {
+      this.$dialog.confirm({
+        title: '提示',
+        message: '确定要确认收货吗 ?'
+      }).then(res => {
+        this.$http.post('/member/goods_order/receive',{
+          order_id: order_id
+        }).then(res => {
+          this.upData.page = 1
+          this.orderList = []
+          this.infiniteId++
+          setTimeout(()=> {
+            this.$toast('已确认收货');
+          },500)
+        }).catch(() => {})
+      }).catch(() => {})
+    },
+    jumpToPage(url,order_id) {
+      this.$router.push({
+        name: url,
+        query: {order_id: order_id}
+      })
     }
   }
 }
@@ -130,11 +194,12 @@ export default {
 
 <style lang="scss" scoped>
 .my-order {
-  height: 100vh;
+  min-height: 100vh;
   font-family: PingFang-SC-Bold;
   background-color: #f8f8f8;
   .top-nav {
-    padding: 0.333333rem;
+    // border-top: 1px solid rgb(94, 188, 252);
+    padding: 0.333333rem 0;
     text-align: center;
     background-color: #40a3ff;
     font-size: 0.48rem;
@@ -156,7 +221,7 @@ export default {
       font-size: 0.4rem;
       line-height: 0.613333rem;
       .top-btn-active {
-        padding: 0.05rem 0.12rem;
+        padding: 0.1rem 0.4rem;
         background-color: #fff;
         border-radius: 0.266667rem;
         color: #40a3ff;
@@ -165,9 +230,9 @@ export default {
   }
   .slide-list {
     .order-item-wrapper {
-      // border: 1px solid red;
+      margin: 8px 0;
       .order-item {
-        margin-top: 0.533333rem;
+        border-bottom: 1px solid #f5f5f5;
         padding: 0.533333rem 0.4rem;
         background-color: #fff;
         display: flex;
@@ -197,7 +262,7 @@ export default {
           }
           .trade-status {
             margin: 0.133333rem 0;
-            font-size: 0.4rem;
+            font-size: 0.32rem;
             line-height: 0.613333rem;
             color: #ff5f5f;
           }
@@ -237,8 +302,10 @@ export default {
     }
   }
   .infinite-toast {
-    margin: 0.266667rem 0;
-    font-size: 0.213333rem;
+    background: #f8f8f8;
+    padding: 0.266667rem 0;
+    font-size: 0.28rem;
+    color: #999;
   }
 }
 </style>

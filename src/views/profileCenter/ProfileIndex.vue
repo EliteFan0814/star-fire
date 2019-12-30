@@ -19,7 +19,7 @@
               <div class="right-info">
                 <div class="right-info-top">
                   <div class="rignt-info-wrapper" @click="toNextPage('ProfileInfo')">
-                    <span class="user-name">{{info.nickname}}</span>
+                    <span class="user-name">{{info.nickname || info.account}}</span>
                     <span class="user-level">
                       <img src="@/assets/personal/v.png" alt="" srcset="">
                       <span class="v-number">{{info.level}}</span>
@@ -43,32 +43,31 @@
       <div class="balance-list">
         <van-row>
           <van-col span="6">
-            <div class="balance-item" @click="toNextPage('Bill','point')">
+            <div class="balance-item" @click="toNextPage('Bill','point','积分')">
               <div class="balance-value">{{info.point}}</div>
               <div class="balance-unit">积分</div>
             </div>
           </van-col>
           <van-col span="6">
-            <div class="balance-item" @click="toNextPage('Bill','reward')">
+            <div class="balance-item" @click="toNextPage('Bill','reward','佣金')">
               <div class="balance-value">{{info.bill_fh}}</div>
               <div class="balance-unit">佣金</div>
             </div>
           </van-col>
           <van-col span="6">
-            <div class="balance-item" @click="toNextPage('Bill','amount')">
+            <div class="balance-item" @click="toNextPage('Bill','amount','余额')">
               <div class="balance-value">{{info.amount}}</div>
               <div class="balance-unit">余额（元）</div>
             </div>
           </van-col>
           <van-col span="6">
-            <div class="balance-item last-item" @click="toNextPage('Bill','reward','fy')">
+            <div class="balance-item last-item" @click="toNextPage('Bill','reward','佣金','fy','返佣')">
               <div class="balance-value">{{info.reward}}</div>
               <div class="balance-unit">推广总收益</div>
             </div>
           </van-col>
         </van-row>
       </div>
-
     </div>
     <!-- 漏单列表 -->
     <div class="lost-order">
@@ -146,7 +145,8 @@
       <!-- 02 我的账单 -->
       <!-- 02 收款账户设置 -->
       <div class="list-format">
-        <van-cell title="我的分润" is-link @click="toNextPage('SliceMoney')">
+        <!-- <van-cell title="我的分润" is-link @click="toNextPage('SliceMoney')"> -->
+        <van-cell title="我的分润" is-link @click="toNextPage('Bill','reward','分润','fy')">
           <img slot="icon" class="other-list-img" src="@/assets/personal/my-splice.png" />
         </van-cell>
         <van-cell title="我要提现" is-link @click="toNextPage('Withdraw')">
@@ -163,7 +163,7 @@
       <!-- 03 我要升级 -->
       <!-- 03 升级记录 -->
       <div class="list-format">
-        <van-cell title="我的兑换券">
+        <van-cell title="我的兑换券" is-link @click="toNextPage('ExchangeCard')">
           <span class="exchange-num" slot="default">{{info.exchange_num}} 张</span>
           <img slot="icon" class="other-list-img" src="@/assets/personal/my-exchange.png" />
         </van-cell>
@@ -196,11 +196,15 @@
         </van-cell>
       </div>
     </div>
+    <div class="up-btn">
+      <van-button type="primary" size="large" @click="logOut">退出登录</van-button>
+    </div>
     <tabbar></tabbar>
   </div>
 </template>
 
 <script>
+import { mapState, mapMutations } from 'vuex'
 import tabbar from '@/components/tabbar'
 export default {
   components: {
@@ -215,6 +219,7 @@ export default {
     this.getProfile()
   },
   methods: {
+    ...mapMutations(['LOG_OUT']),
     // 获取个人信息
     getProfile() {
       this.$http.get('/member/member/info').then(res => {
@@ -229,11 +234,20 @@ export default {
           console.log(err)
         })
     },
-    toNextPage(routerName, accountClass, classClass) {
+    toNextPage(routerName, accountClass, accountText, classClass, classText) {
       this.$router.push({
         name: routerName,
-        query: { accountClass, classClass }
+        query: { accountClass, accountText, classClass, classText }
       })
+    },
+    logOut() {
+      this.$dialog
+        .confirm({ title: '退出登录', message: '退出当前账户' })
+        .then(() => {
+          this.LOG_OUT()
+          this.$router.push('/login')
+        })
+        .catch(() => {})
     }
   }
 }
@@ -244,238 +258,256 @@ export default {
   // background-color: #f5f5f5;
   background-color: #fff;
   margin-top: -50px;
-  margin-bottom: 2rem;
-}
-.profile-info {
-  // border: 1px solid red;
-  // height: 6.666667rem;
-  padding-bottom: 0.933333rem;
-  background: url(../../assets/personal/personalBg.png);
-  background-repeat: no-repeat;
-  background-color: #fff;
-  background-size: cover;
-  background-clip: border-box;
-  background-position: center;
-  background-origin: border-box;
-  // 个人中心
-  .top-bar {
-    text-align: center;
-    padding-top: 0.4rem;
-    font-family: PingFang-SC-Bold;
-    font-size: 0.48rem;
-    font-weight: normal;
-    font-stretch: normal;
-    line-height: 0.533333rem;
-    letter-spacing: 0px;
-    color: #ffffff;
-    .check-in {
-      font-size: 0.4rem;
-    }
-  }
-  // 个人信息
-  .personal-info {
-    // border: 1px solid red;
-    margin-top: 0.866667rem;
+  margin-bottom: 60px;
 
-    .personal-info-wrapper {
-      display: flex;
-      align-items: center;
-      .left-avatar {
-        width: 1.3rem;
-        height: 1.3rem;
-        border: 0.026667rem solid #fff;
-        border-radius: 50%;
-        overflow: hidden;
-        img {
+  .profile-info {
+    // border: 1px solid red;
+    // height: 6.666667rem;
+    padding-bottom: 0.933333rem;
+    background: url(../../assets/personal/personalBg.png);
+    background-repeat: no-repeat;
+    background-color: #fff;
+    background-size: cover;
+    background-clip: border-box;
+    background-position: center;
+    background-origin: border-box;
+    // 个人中心
+    .top-bar {
+      text-align: center;
+      padding-top: 0.4rem;
+      font-family: PingFang-SC-Bold;
+      font-size: 0.48rem;
+      font-weight: normal;
+      font-stretch: normal;
+      line-height: 0.533333rem;
+      letter-spacing: 0px;
+      color: #ffffff;
+      .check-in {
+        font-size: 0.4rem;
+      }
+    }
+    // 个人信息
+    .personal-info {
+      // border: 1px solid red;
+      margin-top: 0.866667rem;
+
+      .personal-info-wrapper {
+        display: flex;
+        align-items: center;
+        .left-avatar {
           width: 1.3rem;
           height: 1.3rem;
+          border: 0.026667rem solid #fff;
+          border-radius: 50%;
+          overflow: hidden;
+          img {
+            width: 1.3rem;
+            height: 1.3rem;
+          }
         }
-      }
-      .right-info {
-        flex-grow: 1;
-        // border: 1px solid red;
-        margin-left: 0.266667rem;
-        font-size: 0.4rem;
-        line-height: 0.533333rem;
-        color: #ffffff;
-        .right-info-top {
-          margin-bottom: 0.2rem;
-          display: flex;
-          justify-content: space-between;
+        .right-info {
+          flex-grow: 1;
+          // border: 1px solid red;
+          margin-left: 0.266667rem;
           font-size: 0.4rem;
           line-height: 0.533333rem;
-          .rignt-info-wrapper {
+          color: #ffffff;
+          .right-info-top {
+            margin-bottom: 0.2rem;
             display: flex;
-            align-items: center;
-            .user-name {
-              display: inline-block;
-              margin-right: 0.166667rem;
-              max-width: 2.4rem;
-              white-space: nowrap;
-              text-overflow: ellipsis;
-              -o-text-overflow: ellipsis;
-              overflow: hidden;
+            justify-content: space-between;
+            font-size: 0.4rem;
+            line-height: 0.533333rem;
+            .rignt-info-wrapper {
+              display: flex;
+              align-items: center;
+              .user-name {
+                display: inline-block;
+                margin-right: 0.166667rem;
+                max-width: 2.6rem;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                -o-text-overflow: ellipsis;
+                overflow: hidden;
+              }
+              .user-level {
+                // border: 1px solid yellow;
+                padding: 0.03rem 0.226667rem;
+                border-radius: 0.24rem;
+                background-color: #407aff;
+                img {
+                  width: 0.4rem;
+                }
+                .v-number {
+                  font-size: 0.16rem;
+                }
+                .v-text {
+                  font-size: 0.293333rem;
+                  margin-left: 0.133333rem;
+                }
+              }
             }
-            .user-level {
-              // border: 1px solid yellow;
-              padding: 0.03rem 0.226667rem;
-              border-radius: 0.24rem;
-              background-color: #407aff;
+            .charge {
+              // border: 1px solid red;
+              display: flex;
+              align-items: center;
+              color: #fffb96;
               img {
-                width: 0.4rem;
+                margin-left: 0.2rem;
+                height: 0.266667rem;
               }
-              .v-number {
-                font-size: 0.16rem;
-              }
-              .v-text {
-                font-size: 0.293333rem;
-                margin-left: 0.133333rem;
-              }
-            }
-          }
-          .charge {
-            // border: 1px solid red;
-            display: flex;
-            align-items: center;
-            color: #fffb96;
-            img {
-              margin-left: 0.2rem;
-              height: 0.266667rem;
             }
           }
         }
+        .right-info-bottom {
+          font-size: 0.346667rem;
+          line-height: 0.533333rem;
+        }
       }
-      .right-info-bottom {
-        font-size: 0.346667rem;
-        line-height: 0.533333rem;
+    }
+    //  余额列表
+    .balance-list {
+      margin-top: 0.666667rem;
+      font-size: 0.48rem;
+      line-height: 0.533333rem;
+      letter-spacing: 0.029333rem;
+      color: #ffffff;
+
+      .balance-item {
+        border-right: 0.013333rem solid #fff;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        .balance-value {
+          margin-bottom: 0.2rem;
+          font-size: 0.32rem;
+        }
+        .balance-unit {
+          font-size: 0.32rem;
+          letter-spacing: 0.018667rem;
+          color: #ffffff;
+        }
+      }
+      .last-item {
+        border-right: none;
       }
     }
   }
-  //  余额列表
-  .balance-list {
-    margin-top: 0.666667rem;
-    font-size: 0.48rem;
+  // 漏单列表
+  .lost-order {
+    margin-top: -0.566667rem;
+    font-size: 0.426667rem;
     line-height: 0.533333rem;
-    letter-spacing: 0.029333rem;
-    color: #ffffff;
-
-    .balance-item {
-      border-right: 0.013333rem solid #fff;
+    color: #333333;
+    .lost-wrapper {
       display: flex;
-      flex-direction: column;
       justify-content: space-between;
       align-items: center;
-      .balance-value {
-        margin-bottom: 0.2rem;
+      background-color: #ffffff;
+      box-shadow: 0px 2px 16px 0px rgba(8, 1, 3, 0.07);
+      border-radius: 10px;
+      padding: 0.466667rem 0.626667rem;
+      .lost-amount {
+        .lost-warn {
+          margin-left: 0.266667rem;
+          padding: 0.05rem 0.12rem;
+          background-color: #ff5f5f;
+          border-radius: 20px;
+        }
       }
-      .balance-unit {
-        font-size: 0.32rem;
-        letter-spacing: 0.018667rem;
-        color: #ffffff;
-      }
-    }
-    .last-item {
-      border-right: none;
-    }
-  }
-}
-// 漏单列表
-.lost-order {
-  margin-top: -0.566667rem;
-  font-size: 0.426667rem;
-  line-height: 0.533333rem;
-  color: #333333;
-  .lost-wrapper {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #ffffff;
-    box-shadow: 0px 2px 16px 0px rgba(8, 1, 3, 0.07);
-    border-radius: 10px;
-    padding: 0.466667rem 0.626667rem;
-    .lost-amount {
-      .lost-warn {
-        margin-left: 0.266667rem;
-        padding: 0.05rem 0.12rem;
-        background-color: #ff5f5f;
-        border-radius: 20px;
-      }
-    }
-    .lost-money {
-      .lost-all-money {
-        color: #ff5f5f;
-        font-weight: bolder;
+      .lost-money {
+        .lost-all-money {
+          color: #ff5f5f;
+          font-weight: bolder;
+        }
       }
     }
   }
-}
-//  推广广告
-.jump-banner {
-  background-color: #fff;
-  margin-top: 0.466667rem;
-  img {
-    width: 100%;
-  }
-}
-//  我的订单
-.my-order {
-  .order-wrapper {
-    // border-bottom: 1px solid red;
-    .van-cell:not(:last-child)::after {
-      border: none;
+  //  推广广告
+  .jump-banner {
+    background-color: #fff;
+    margin-top: 0.466667rem;
+    img {
+      width: 100%;
     }
   }
-  .order-img {
-    height: 0.453333rem;
-    width: 0.373333rem;
-    margin: auto 0;
-    margin-right: 0.133333rem;
-  }
-  .order-img-list {
-    border-top: 1px solid #ddd;
-    padding-top: 0.426667rem;
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    font-size: 0.32rem;
-    line-height: 0.533333rem;
-    letter-spacing: 0.018667rem;
-    color: #999999;
-    .img-item {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      img {
-        width: 0.626667rem;
-        margin-bottom: 0.213333rem;
+  //  我的订单
+  .my-order {
+    .order-wrapper {
+      // border-bottom: 1px solid red;
+      .van-cell:not(:last-child)::after {
+        border: none;
       }
     }
-  }
-}
-// 其他列表
-.other-list {
-  border-top: 0.5px solid transparent;
-  background-color: #f5f5f5;
-  .list-format {
-    margin-top: 0.213333rem;
-    .other-list-img {
+    .order-img {
       height: 0.453333rem;
-      width: 0.453333rem;
+      width: 0.373333rem;
       margin: auto 0;
       margin-right: 0.133333rem;
     }
-    .exchange-num {
-      color: #ff5f5f;
+    .order-img-list {
+      border-top: 1px solid #ddd;
+      padding-top: 0.426667rem;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      font-size: 0.32rem;
+      line-height: 0.533333rem;
+      letter-spacing: 0.018667rem;
+      color: #999999;
+      .img-item {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        img {
+          width: 0.626667rem;
+          margin-bottom: 0.213333rem;
+        }
+      }
     }
   }
-  .my-team {
-    .my-team-num {
-      margin-left: 0.266667rem;
-      padding: 0.05rem 0.12rem;
-      background-color: #40a3ff;
-      border-radius: 20px;
-      color: #fff;
+  // 其他列表
+  .other-list {
+    border-top: 0.5px solid transparent;
+    background-color: #f5f5f5;
+    .list-format {
+      margin-top: 0.213333rem;
+      .other-list-img {
+        height: 0.453333rem;
+        width: 0.453333rem;
+        margin: auto 0;
+        margin-right: 0.133333rem;
+      }
+      .exchange-num {
+        color: #ff5f5f;
+      }
+    }
+    .my-team {
+      .my-team-num {
+        margin-left: 0.266667rem;
+        padding: 0.05rem 0.12rem;
+        background-color: #40a3ff;
+        border-radius: 20px;
+        color: #fff;
+      }
+    }
+  }
+
+  .up-btn {
+    display: flex;
+    justify-content: center;
+    margin-top: 0.213333rem;
+    button {
+      width: 6.853333rem;
+      height: 1.066667rem;
+      background-color: #03d13e;
+      border-radius: 0.533333rem;
+      font-size: 0.4rem;
+      line-height: 0.533333rem;
+      letter-spacing: 0.048rem;
+      color: #fefefe;
     }
   }
 }

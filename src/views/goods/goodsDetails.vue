@@ -16,7 +16,7 @@
       <div>
         <span>￥{{item.member_price}}</span>
         <span><span v-if="item.param != 10">{{item.param}}折</span></span>
-        <span>原价：{{item.price}}</span>
+        <del>原价：{{item.price}}</del>
       </div>
       <div>{{item.title}}</div>
       <div>
@@ -171,12 +171,15 @@ export default {
         font-size: .48rem;
       }
       :nth-child(2) {
-        padding: 0 .2rem;
-        margin: 0 .25rem;
-        background: #f31e1e;
-        font-size: .293333rem;
-        color: #fff;
-        border-radius: .1rem;
+        > span {
+          padding: 0.05rem .25rem;
+          margin: 0 .3rem;
+          background: #f31e1e;
+          font-size: .293333rem;
+          color: #fff;
+          border-radius: .1rem;
+        }
+        
       }
       :nth-child(3) {
         color: #999;

@@ -26,18 +26,14 @@
       </div>
     </div>
   </div>
-  <infinite-loading
-      @infinite="getGoods"
-      v-if="goodsShow"
-      :identifier="infiniteId"
-      direction="bottom"
-      style="font-size: .3rem;">
-      <div slot="spinner"class="whiteBg">读取中...</div>
-      <div slot="no-more" class="whiteBg">已加载全部</div>
-      <div slot="no-results" class="whiteBg" >
-        <p>暂无商品</p>
-      </div>
-    </infinite-loading>
+  <infinite-loading @infinite="getGoods" :identifier="infiniteId">
+    <div slot="spinner"class="whiteBg">读取中...</div>
+    <div slot="no-more" class="whiteBg">已加载全部</div>
+    <div slot="no-results" class="whiteBg" >
+      <img src="@/assets/index/none.png" width="100" style="margin-top: 20px" alt="">
+      <p>暂无商品</p>
+    </div>
+  </infinite-loading>
 </div>
 </template>
 <script>
@@ -54,7 +50,6 @@ export default {
       item: {},
       yincang: '',
       goodsList: [],
-      goodsShow: true,
       infiniteId: +new Date(),
       fenlei: [],
 
@@ -82,17 +77,9 @@ export default {
         if (res.data.list.length) {
           this.page += 1;          
           this.goodsList.push(...res.data.list);
-          if(res.data.list.length<10){
-            this.goodsShow = false;
-            $state.complete();
-          }
-          else{
-            $state.loaded();
-            this.goodsShow =true;
-          }
+          $state.loaded();
         } else {
           $state.complete();
-          this.goodsShow = false;
         }
       }).catch(err => {});
     },
@@ -102,8 +89,8 @@ export default {
 <style lang="scss" scoped>
 .mallTop {
   background: #fff;
-  position: fixed;
-  height: .8rem;
+  // position: fixed;
+  height: .5rem;
   color: #ff5f5f;
   display: flex;
   justify-content: space-between;
@@ -115,7 +102,7 @@ export default {
 }
 .goodsList {
   padding: 0 .533333rem;
-  padding-top: 1rem;
+  padding-top: .3rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -172,5 +159,9 @@ export default {
       }
     }
   }
+}
+.whiteBg {
+  font-size: 0.28rem;
+  color: #999;
 }
 </style>

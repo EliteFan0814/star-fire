@@ -1,12 +1,12 @@
 <template>
   <div class="profile-info">
-    <publicHeader :icon="true" name="我的账单"></publicHeader>
-    <div class="filter-menu">
+    <publicHeader :icon="true" :name="topBarText"></publicHeader>
+    <!-- <div class="filter-menu">
       <van-dropdown-menu>
         <van-dropdown-item v-model="upData.type" :options="filter_account" />
         <van-dropdown-item v-model="upData.class" :options="filter_class" />
       </van-dropdown-menu>
-    </div>
+    </div> -->
     <div class="bill-list">
       <van-collapse v-model="activeNames">
         <div v-for="(item,index) in billList" :key="index">
@@ -55,6 +55,15 @@ export default {
     }
   },
   computed: {
+    topBarText() {
+      if (this.$route.query.accountText) {
+        if (this.$route.query.classText) {
+          return '我的推广总收益'
+        }
+        return '我的' + this.$route.query.accountText
+      }
+      return '我的账单'
+    },
     filter_account() {
       return this.filterClass(this.account_screen, '所有账户')
     },
@@ -138,12 +147,6 @@ export default {
 
 <style lang="scss" scoped>
 .profile-info {
-  .pagination {
-    left: 50%;
-    transform: translateX(-50%);
-    bottom: 0.133333rem;
-    position: absolute;
-  }
   .infinite-toast {
     margin: 0.266667rem 0;
     font-size: 0.213333rem;

@@ -108,9 +108,10 @@ export default {
         message: '确认支付该订单'
       }).then(() => {
         // 立即购买
-        this.$http.post('/member/goods_order/submit_a', {
+        this.$http.post('/member/exchange_order/exchangeAdd', {
           adr_id: this.addressInfo.id,
-          ...this.item
+          exchange_id: this.item.goods_id,
+          buy_nums: this.item.goods_num
         }).then(res => {
           this.$toast('订单支付成功');
           this.$router.push({name: 'Order'})

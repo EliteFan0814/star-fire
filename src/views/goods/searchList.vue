@@ -17,6 +17,7 @@
     <div slot="spinner"class="whiteBg">读取中...</div>
     <div slot="no-more" class="whiteBg">已加载全部</div>
     <div slot="no-results" class="whiteBg" >
+      <img src="@/assets/index/none.png" width="100" style="margin-top: 20px" alt="">
       <p>暂无商品</p>
     </div>
   </infinite-loading> 
@@ -56,12 +57,7 @@ export default {
         if (res.data.list.length) {
           this.page += 1;   
           this.goodsList.push(...res.data.list);
-          if(res.data.list.length<10){
-            $state.complete();
-          }
-          else{
-            $state.loaded();
-          }
+          $state.loaded();
         } else {
           $state.complete();
         }
@@ -81,5 +77,6 @@ export default {
 }
 .whiteBg {
   height: .5rem;
+  color: #999;
 }
 </style>

@@ -23,9 +23,9 @@
             <span slot="title">分润余额：</span>
             <span slot="default" class="split-balance">￥{{splitBalance}}</span>
           </van-cell> -->
-          <van-field clearable v-model="withdrawMoney" label="提现金额：" placeholder="请输入" input-align="right" />
+          <van-field clearable v-model="upData.money" label="提现金额：" placeholder="请输入金额" input-align="right" />
           <div class="up-btn">
-            <van-button type="primary" size="large">提现</van-button>
+            <van-button type="primary" size="large" @click="upWithdraw">提现</van-button>
           </div>
         </div>
       </div>
@@ -52,12 +52,12 @@ export default {
       splitWay: '支付宝',
       splitWayValue: 0,
       // splitBalance: '0.00',
-      withdrawMoney: '',
       wxAccount: {},
       aliAccount: {},
       upData: {
         cash_type: '',
-        money: 0
+        type: '',
+        money: ''
       }
     }
   },
@@ -65,7 +65,7 @@ export default {
     this.getAccountList()
   },
   methods: {
-    // 获取支付宝和微信账户信息
+    // 获取支付宝和微信账户信息 默认为 余额 支付宝 提现
     getAccountList() {
       this.$http.get('/member/cash_account/lists').then(res => {
         res.data.list.map(item => {
@@ -76,6 +76,10 @@ export default {
             this.aliAccount = item
           }
         })
+        this.upData.cash_type = 'amount'
+        this.upData.type = 'ALI'
+        this.upData = { ...this.upData, ...this.aliAccount }
+        console.log('默认：', this.upData)
       })
     },
     classPopup() {
@@ -88,17 +92,34 @@ export default {
       this.showClass = false
       this.showAccount = false
     },
+    // 提现类型选择
     confirmClass(value, index) {
       this.classWay = value
       this.classWayValue = this.classValue[index]
+      this.upData.cash_type = this.classValue[index]
       // console.log(this.classWay,this.classWayValue)
       this.showClass = false
     },
+    // 提现账户选择
     confirmAccount(value, index) {
       this.splitWay = value
       this.splitWayValue = this.accountValue[index]
+      if (this.accountValue[index] === 'ALI') {
+        this.upData = { ...this.upData, ...this.aliAccount }
+      } else {
+        this.upData = { ...this.upData, ...this.wxAccount }
+      }
       // console.log(this.splitWay,this.splitWayValue)
       this.showAccount = false
+    },
+    upWithdraw() {
+      console.log('提交：', this.upData)
+      this.$http.post('/member/cash/apply',{...this.upData}).then(res=>{
+        // console.log('res',res)
+        if(res.code === 1){
+          this.$toast.success(res.msg)
+        }
+      })
     }
   }
 }
